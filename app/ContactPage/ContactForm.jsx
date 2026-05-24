@@ -4,7 +4,7 @@ import React, { useState, useContext, useEffect, Suspense } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
-import { submitContactForm, fetchContactTypes } from "../lib/server-api";
+import { submitContactForm } from "../lib/server-api";
 import {
   FaUser,
   FaPhone,
@@ -44,15 +44,33 @@ const ContactFormContent = () => {
 
   // Fetch Contact Types
   useEffect(() => {
+    let isMounted = true;
+
     const getContactTypes = async () => {
       try {
-        const data = await fetchContactTypes();
-        setContactTypes(data);
+        const response = await fetch("/api/nav-data", {
+          headers: {
+            Accept: "application/json",
+          },
+        });
+        const data = response.ok ? await response.json() : null;
+
+        if (!isMounted) return;
+        setContactTypes(
+          Array.isArray(data?.contactTypes) ? data.contactTypes : [],
+        );
       } catch (err) {
-        console.error("Failed to fetch contact types:", err);
+        if (isMounted) {
+          setContactTypes([]);
+        }
       }
     };
+
     getContactTypes();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   // Update selection if URL param changes
