@@ -2,6 +2,13 @@ const baseUrl =
   process.env.NEXT_PUBLIC_BASE_URL || "https://api.mohamedtalat.com/api";
 const apiKey =
   process.env.NEXT_PUBLIC_API_KEY || "P4OIp8prRKBeO0kogfGViTNzmAT8UnzL";
+const isServer = typeof window === "undefined";
+
+function logApiError(label, err) {
+  if (isServer) {
+    console.error(`${label} Error:`, err);
+  }
+}
 
 /**
  * Fetch generic global website settings from backend
@@ -21,7 +28,7 @@ export async function fetchSettings() {
     const json = await res.json();
     return json?.data || null;
   } catch (err) {
-    console.error("fetchSettings Error:", err);
+    logApiError("fetchSettings", err);
     return null;
   }
 }
@@ -44,7 +51,7 @@ export async function fetchSliders() {
     const json = await res.json();
     return json?.data?.sliders || [];
   } catch (err) {
-    console.error("fetchSliders Error:", err);
+    logApiError("fetchSliders", err);
     return [];
   }
 }
@@ -67,7 +74,7 @@ export async function fetchContactTypes() {
     const json = await res.json();
     return json?.data || [];
   } catch (err) {
-    console.error("fetchContactTypes Error:", err);
+    logApiError("fetchContactTypes", err);
     return [];
   }
 }
@@ -87,7 +94,7 @@ export async function submitContactForm(formData) {
 
     return res;
   } catch (err) {
-    console.error("submitContactForm Error:", err);
+    logApiError("submitContactForm", err);
     throw err;
   }
 }
@@ -112,7 +119,7 @@ export async function subscribeNewsletter(email, phone) {
 
     return res;
   } catch (err) {
-    console.error("subscribeNewsletter Error:", err);
+    logApiError("subscribeNewsletter", err);
     throw err;
   }
 }
@@ -135,7 +142,7 @@ export async function fetchPixelsScripts() {
     const json = await res.json();
     return json?.data || [];
   } catch (err) {
-    console.error("fetchPixelsScripts Error:", err);
+    logApiError("fetchPixelsScripts", err);
     return [];
   }
 }
@@ -163,7 +170,7 @@ export async function fetchTestimonials(params = {}) {
     const json = await res.json();
     return json?.data || null;
   } catch (err) {
-    console.error("fetchTestimonials Error:", err);
+    logApiError("fetchTestimonials", err);
     return null;
   }
 }
@@ -191,7 +198,7 @@ export async function fetchConferences(params = {}) {
     const json = await res.json();
     return json?.data || null;
   } catch (err) {
-    console.error("fetchConferences Error:", err);
+    logApiError("fetchConferences", err);
     return null;
   }
 }
@@ -222,7 +229,7 @@ export async function accessVault(password, page = 1) {
       message: json?.message || "Success",
     };
   } catch (err) {
-    console.error("accessVault Error:", err);
+    logApiError("accessVault", err);
     return { success: false, message: "Network error" };
   }
 }
@@ -244,7 +251,7 @@ export async function fetchArticleTypes() {
     const json = await res.json();
     return json?.data || [];
   } catch (err) {
-    console.error("fetchArticleTypes Error:", err);
+    logApiError("fetchArticleTypes", err);
     return [];
   }
 }
@@ -259,7 +266,11 @@ export async function fetchArticlesList(typeSlug, params = {}) {
       url.searchParams.append("type_slug", typeSlug);
     }
     Object.keys(params).forEach((key) => {
-      if (params[key] !== undefined && params[key] !== null && params[key] !== "") {
+      if (
+        params[key] !== undefined &&
+        params[key] !== null &&
+        params[key] !== ""
+      ) {
         url.searchParams.append(key, params[key]);
       }
     });
@@ -279,7 +290,7 @@ export async function fetchArticlesList(typeSlug, params = {}) {
     const json = await res.json();
     return json?.data || null;
   } catch (err) {
-    console.error("fetchArticlesList Error:", err);
+    logApiError("fetchArticlesList", err);
     return null;
   }
 }
@@ -300,7 +311,7 @@ export async function fetchArticleDetails(slug) {
     const json = await res.json();
     return json?.data || null;
   } catch (err) {
-    console.error("fetchArticleDetails Error:", err);
+    logApiError("fetchArticleDetails", err);
     return null;
   }
 }
@@ -323,7 +334,7 @@ export async function fetchPages() {
     const json = await res.json();
     return json?.data || [];
   } catch (err) {
-    console.error("fetchPages Error:", err);
+    logApiError("fetchPages", err);
     return [];
   }
 }
@@ -344,7 +355,7 @@ export async function fetchPostCategories() {
     const json = await res.json();
     return json?.data?.data || [];
   } catch (err) {
-    console.error("fetchPostCategories Error:", err);
+    logApiError("fetchPostCategories", err);
     return [];
   }
 }
@@ -370,7 +381,7 @@ export async function fetchPosts(params = {}) {
     const json = await res.json();
     return json?.data || null;
   } catch (err) {
-    console.error("fetchPosts Error:", err);
+    logApiError("fetchPosts", err);
     return null;
   }
 }
@@ -391,7 +402,7 @@ export async function fetchPostDetails(slug) {
     const json = await res.json();
     return json?.data || null;
   } catch (err) {
-    console.error("fetchPostDetails Error:", err);
+    logApiError("fetchPostDetails", err);
     return null;
   }
 }
@@ -417,7 +428,7 @@ export async function fetchPodcasts(params = {}) {
     const json = await res.json();
     return json?.data || null;
   } catch (err) {
-    console.error("fetchPodcasts Error:", err);
+    logApiError("fetchPodcasts", err);
     return null;
   }
 }
@@ -441,7 +452,7 @@ export async function fetchGalleries(params = {}) {
     if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
     return await res.json();
   } catch (err) {
-    console.error("fetchGalleries Error:", err);
+    logApiError("fetchGalleries", err);
     return null;
   }
 }
@@ -468,7 +479,7 @@ export async function askTalatAI(articleId, message, history = []) {
     const json = await res.json();
     return json;
   } catch (err) {
-    console.error("askTalatAI Error:", err);
+    logApiError("askTalatAI", err);
     throw err;
   }
 }

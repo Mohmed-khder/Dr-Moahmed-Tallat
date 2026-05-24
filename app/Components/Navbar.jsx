@@ -7,11 +7,6 @@ import { useSettings } from "../Context/SettingContext";
 import { useVault } from "../Context/VaultContext";
 import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 import { FaPaperPlane, FaChevronDown, FaLock } from "react-icons/fa";
-import {
-  fetchContactTypes,
-  fetchArticleTypes,
-  fetchPostCategories,
-} from "../lib/server-api";
 import Image from "next/image";
 import VaultModal from "./VaultModal";
 import SearchPopup from "./SearchPopup";
@@ -131,13 +126,35 @@ const Navbar = () => {
   const [isMobileExecutiveDropdownOpen, setIsMobileExecutiveDropdownOpen] =
     useState(false);
   const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
-  const [postCategories, setPostCategories] = useState([]);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   useEffect(() => {
-    fetchContactTypes().then(setContactTypes).catch(console.error);
-    fetchArticleTypes().then(setArticleTypes).catch(console.error);
-    fetchPostCategories().then(setPostCategories).catch(console.error);
+    let isMounted = true;
+
+    fetch("/api/nav-data", {
+      headers: {
+        Accept: "application/json",
+      },
+    })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!isMounted) return;
+        setContactTypes(
+          Array.isArray(data?.contactTypes) ? data.contactTypes : [],
+        );
+        setArticleTypes(
+          Array.isArray(data?.articleTypes) ? data.articleTypes : [],
+        );
+      })
+      .catch(() => {
+        if (!isMounted) return;
+        setContactTypes([]);
+        setArticleTypes([]);
+      });
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
