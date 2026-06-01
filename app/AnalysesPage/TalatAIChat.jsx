@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { HiSparkles, HiOutlinePaperAirplane, HiX, HiChevronDown } from "react-icons/hi";
 import { askTalatAI } from "../../app/lib/server-api";
+import { trackMetaCustomEvent } from "../../app/lib/tracking";
 
 
 const TalatAIChat = ({ articleId, articleTitle, isRTL }) => {
@@ -86,7 +87,13 @@ const TalatAIChat = ({ articleId, articleTitle, isRTL }) => {
   if (!isOpen) {
     return (
       <button
-        onClick={() => setIsOpen(true)}
+        onClick={() => {
+          trackMetaCustomEvent("AIAssistantClick", {
+            assistant_type: "article_chat",
+            article_id: articleId,
+          });
+          setIsOpen(true);
+        }}
         className="mt-6 w-full group relative overflow-hidden bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/20 rounded-3xl  shadow-sm hover:shadow-lg transition-all duration-300"
       >
         <div className="bg-white rounded-[1.4rem] px-4 py-4 flex items-center justify-between transition-colors group-hover:bg-slate-50/50">

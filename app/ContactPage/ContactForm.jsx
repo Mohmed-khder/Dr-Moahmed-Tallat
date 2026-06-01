@@ -5,6 +5,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import { submitContactForm } from "../lib/server-api";
+import { trackMetaEvent } from "../lib/tracking";
 import {
   FaUser,
   FaPhone,
@@ -240,6 +241,8 @@ const ContactFormContent = () => {
       console.log("API Response:", response);
 
       if (response.ok) {
+        trackMetaEvent("Lead", { lead_source: "contact_form" });
+        trackMetaEvent("Contact", { contact_method: "contact_form" });
         toast.success(t("contactForm.successMessage"), {
           position: isRTL ? "top-left" : "top-right",
           autoClose: 5000,

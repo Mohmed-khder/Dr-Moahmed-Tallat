@@ -20,6 +20,7 @@ import {
   FaArrowRight,
 } from "react-icons/fa";
 import { useSettings } from "../Context/SettingContext";
+import { formatWhatsAppUrl } from "../lib/whatsapp";
 import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/effect-fade";
@@ -37,7 +38,9 @@ const SliderHome = ({ initialSliders = [] }) => {
     twitter: settings?.social_links?.twitter || null,
     linkedin: settings?.social_links?.linkedin || null,
     youtube: settings?.social_links?.youtube || null,
-    whatsapp: settings?.whatsapp || settings?.social_links?.whatsapp || null,
+    whatsapp: formatWhatsAppUrl(
+      settings?.whatsapp || settings?.social_links?.whatsapp,
+    ),
   };
 
   const handleSlideClick = (link) => {

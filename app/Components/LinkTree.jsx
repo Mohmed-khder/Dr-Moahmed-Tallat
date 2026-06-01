@@ -12,6 +12,7 @@ import {
 import { Link } from "../../i18n/routing";
 import { useSettings } from "../Context/SettingContext";
 import { useLocale } from "next-intl";
+import { formatWhatsAppUrl } from "../lib/whatsapp";
 const LinkTree = () => {
   const t = useTranslations();
   const { settings } = useSettings();
@@ -20,7 +21,7 @@ const LinkTree = () => {
   const facebookUrl = settings?.social_links?.facebook || null;
   const instagramUrl = settings?.social_links?.instagram || null;
   const twitterUrl = settings?.social_links?.twitter || null;
-  const whatsappUrl = settings?.whatsapp || null;
+  const whatsappUrl = formatWhatsAppUrl(settings?.whatsapp);
 
   const logo = settings?.logo || null;
 

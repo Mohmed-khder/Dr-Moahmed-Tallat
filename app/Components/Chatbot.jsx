@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { FiSend, FiX } from "react-icons/fi";
 import { HiChatBubbleLeftRight } from "react-icons/hi2";
+import { trackMetaCustomEvent } from "../lib/tracking";
 
 const Chatbot = () => {
   const t = useTranslations("chatbot");
@@ -22,7 +23,14 @@ const Chatbot = () => {
     scrollToBottom();
   }, [messages, isTyping]);
 
-  const toggleChat = () => setIsOpen(!isOpen);
+  const toggleChat = () => {
+    if (!isOpen) {
+      trackMetaCustomEvent("AIAssistantClick", {
+        assistant_type: "floating_chatbot",
+      });
+    }
+    setIsOpen(!isOpen);
+  };
 
   const sendMessage = async (e) => {
     e.preventDefault();

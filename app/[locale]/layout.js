@@ -12,6 +12,8 @@ import { fetchSettings } from "../lib/server-api";
 import ScrollToTop from "../Components/ScrollToTop";
 import { Top } from "../Components/Top";
 import Chatbot from "../Components/Chatbot";
+import MetaPixelTracker from "../Components/MetaPixelTracker";
+import { META_PIXEL_ID } from "../lib/tracking";
 
 export async function generateMetadata({ params }) {
   const resolvedParams = await params;
@@ -146,6 +148,16 @@ export default async function RootLayout(props) {
           ></iframe>
         </noscript>
         {/* End Google Tag Manager (noscript) */}
+        <noscript>
+          {/* eslint-disable-next-line @next/next/no-img-element -- Meta requires a raw tracking pixel fallback. */}
+          <img
+            height="1"
+            width="1"
+            style={{ display: "none" }}
+            src={`https://www.facebook.com/tr?id=${META_PIXEL_ID}&ev=PageView&noscript=1`}
+            alt=""
+          />
+        </noscript>
         <Script id="gtm-script" strategy="afterInteractive">
           {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -153,6 +165,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
 })(window,document,'script','dataLayer','GTM-5KXFQMQT');`}
         </Script>
+        <MetaPixelTracker />
         <NextIntlClientProvider messages={messages}>
           <Providers initialSettings={globalSettings}>
             <div

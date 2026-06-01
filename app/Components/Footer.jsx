@@ -20,6 +20,11 @@ import { subscribeNewsletter } from "../lib/server-api";
 import { useSettings } from "../Context/SettingContext";
 import { Link } from "../../i18n/routing";
 import Image from "next/image";
+import {
+  trackMetaCustomEvent,
+  trackMetaEvent,
+} from "../lib/tracking";
+import { formatWhatsAppUrl } from "../lib/whatsapp";
 const Footer = () => {
   const t = useTranslations();
   const locale = useLocale();
@@ -49,7 +54,7 @@ const Footer = () => {
   const twitterUrl = settings?.social_links?.twitter || "https://x.com/mohdtalaat_gcc";
   const linkedinUrl = settings?.social_links?.linkedin || "https://www.linkedin.com/in/mohdtalat/";
   const youtubeUrl = settings?.social_links?.youtube || "https://www.youtube.com/@mohdtalaat";
-  const whatsappUrl = settings?.whatsapp || null;
+  const whatsappUrl = formatWhatsAppUrl(settings?.whatsapp);
 
   // Math question generator helper function
   const generateMathQuestion = () => {
@@ -193,6 +198,10 @@ const Footer = () => {
       const response = await subscribeNewsletter(email, phone);
 
       if (response.ok) {
+        trackMetaEvent("Subscribe", { subscription_type: "newsletter" });
+        trackMetaCustomEvent("NewsletterSignup", {
+          subscription_type: "newsletter",
+        });
         toast.success(t("footer.newsletterSuccess"), {
           position: isRTL ? "top-left" : "top-right",
           autoClose: 5000,
