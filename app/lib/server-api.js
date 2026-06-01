@@ -21,7 +21,7 @@ export async function fetchSettings() {
         "Content-Type": "application/json",
         "X-Api-Key": apiKey,
       },
-      next: { revalidate: 3600 },
+      cache: "no-store",
     });
 
     if (!res.ok) return null;
@@ -44,7 +44,7 @@ export async function fetchSliders() {
         "Content-Type": "application/json",
         "X-Api-Key": apiKey,
       },
-      next: { revalidate: 3600 },
+      cache: "no-store",
     });
 
     if (!res.ok) return [];
