@@ -1,36 +1,104 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Mohamed Talaat Portfolio
+
+Official portfolio and publishing platform for Dr. Mohamed Talaat. The site presents strategic analyses, media appearances, galleries, podcasts, quotations, research archive content, and institutional information pages in Arabic and English.
+
+## Features
+
+- Internationalized routing with Arabic and English locales.
+- Portfolio sections for home, about, analyses, galleries, podcasts, quotations, meetings and conferences, FAQs, and contact.
+- Dynamic article detail pages with localized SEO metadata.
+- Research archive experience with protected archive access.
+- API-backed navigation/content data through the local `app/api/nav-data` route.
+- Responsive UI built with animations, sliders, icons, and toast feedback.
+- SEO, manifest, robots, sitemap, analytics, and security header configuration.
+
+## Tech Stack
+
+- [Next.js](https://nextjs.org/) 16
+- [React](https://react.dev/) 19
+- [next-intl](https://next-intl.dev/) for localization
+- [Tailwind CSS](https://tailwindcss.com/) 4
+- [styled-components](https://styled-components.com/)
+- [Framer Motion](https://www.framer.com/motion/)
+- [Swiper](https://swiperjs.com/)
+- [Axios](https://axios-http.com/)
 
 ## Getting Started
 
-First, run the development server:
+Install dependencies:
+
+```bash
+npm install
+```
+
+Run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## Available Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run dev
+```
 
-## Learn More
+Starts the local development server.
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run build
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Creates a production build.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm run start
+```
 
-## Deploy on Vercel
+Runs the production server after a build.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+npm run lint
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Runs ESLint.
+
+## Project Structure
+
+```text
+app/
+  [locale]/                 Localized routes and page metadata
+  Components/               Shared UI components
+  HomePage/                 Home page sections
+  AboutPage/                About page sections
+  AnalysesPage/             Analysis listing/detail UI
+  GalleriesPage/            Gallery UI
+  podcastsPage/             Podcast UI
+  ResearchArchivePage/      Research archive UI
+  InformationPages/         Static information page components
+  Locales/                  Translation files
+  api/nav-data/             Local API route
+i18n/                       next-intl request and routing config
+public/                     Public assets and verification files
+```
+
+## Localization
+
+Translations live in:
+
+- `app/Locales/en/translation.json`
+- `app/Locales/ar/translation.json`
+
+Routing configuration lives in `i18n/routing.js`, and request handling lives in `i18n/request.js`.
+
+## Deployment
+
+The app is configured for standard Next.js deployment. Remote image domains and security headers are configured in `next.config.mjs`.
+
+Build before deployment:
+
+```bash
+npm run build
+```
