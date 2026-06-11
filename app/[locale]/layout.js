@@ -14,6 +14,7 @@ import { Top } from "../Components/Top";
 import Chatbot from "../Components/Chatbot";
 import MetaPixelTracker from "../Components/MetaPixelTracker";
 import { META_PIXEL_ID } from "../lib/tracking";
+import MaintenanceMode from "../Components/MaintenanceMode";
 
 export async function generateMetadata({ params }) {
   const resolvedParams = await params;
@@ -99,6 +100,7 @@ export default async function RootLayout(props) {
   }
   const baseUrl = "https://mohamedtalat.com";
   const siteName = globalSettings?.site_name?.[locale] || "Dr. Mohamed Talaat";
+  const isWebsiteDisabled = globalSettings?.website_enabled === false;
 
   return (
     <html
@@ -168,17 +170,21 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         <MetaPixelTracker />
         <NextIntlClientProvider messages={messages}>
           <Providers initialSettings={globalSettings}>
-            <div
-              id="site-main-content"
-              className="transition-opacity duration-1000"
-            >
-              <ScrollToTop />
-              <Top />
-              <Navbar />
-              <main>{children}</main>
-              <Footer />
-              <Chatbot />
-            </div>
+            {isWebsiteDisabled ? (
+              <MaintenanceMode locale={locale} settings={globalSettings} />
+            ) : (
+              <div
+                id="site-main-content"
+                className="transition-opacity duration-1000"
+              >
+                <ScrollToTop />
+                <Top />
+                <Navbar />
+                <main>{children}</main>
+                <Footer />
+                <Chatbot />
+              </div>
+            )}
           </Providers>
         </NextIntlClientProvider>
       </body>

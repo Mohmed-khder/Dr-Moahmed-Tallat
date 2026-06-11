@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect } from "react";
 import Image from "next/image";
-import { useRouter } from "../../i18n/routing";
+import { Link, useRouter } from "../../i18n/routing";
 import { useParams } from "next/navigation";
 import {
   FaFilePdf,
@@ -15,6 +15,9 @@ import {
   FaStar,
   FaTags,
   FaQuoteLeft,
+  FaArrowLeft,
+  FaArrowRight,
+  FaTimes,
 } from "react-icons/fa";
 import { GrScheduleNew } from "react-icons/gr";
 import { RiAiGenerate } from "react-icons/ri";
@@ -30,7 +33,206 @@ import {
 import { BiBullseye } from "react-icons/bi";
 import TalatAIChat from "./TalatAIChat";
 
-const AnalysesDetails = ({ article, translations, locale, isRTL }) => {
+const SUGGESTION_VISIBLE_MS = 15000;
+const SUGGESTION_HIDDEN_MS = 180000;
+const SUGGESTION_INITIAL_DELAY_MS = 6000;
+
+function stripHtml(value) {
+  if (!value) return "";
+  return value.replace(/<[^>]*>?/gm, "").replace(/\s+/g, " ").trim();
+}
+
+const TimedArticleSuggestion = ({
+  article,
+  recommendedArticles = [],
+  locale,
+  isRTL,
+}) => {
+  const [imageBroken, setImageBroken] = React.useState(false);
+  const [suggestedArticle, setSuggestedArticle] = React.useState(null);
+  const [isVisible, setIsVisible] = React.useState(false);
+  const [progress, setProgress] = React.useState(100);
+  const lastSuggestedIdRef = React.useRef(null);
+  const articleSlug = article.slug?.[locale] || article.slug?.["en"];
+
+  const recommendationPool = React.useMemo(
+    () =>
+      recommendedArticles.filter((item) => {
+        const itemSlug = item.slug?.[locale] || item.slug?.["en"];
+        return item?.id !== article.id && itemSlug && itemSlug !== articleSlug;
+      }),
+    [recommendedArticles, article.id, articleSlug, locale],
+  );
+
+  const pickRandomSuggestion = React.useCallback(() => {
+    if (!recommendationPool.length) return null;
+
+    const filteredPool =
+      recommendationPool.length > 1
+        ? recommendationPool.filter(
+            (item) => item.id !== lastSuggestedIdRef.current,
+          )
+        : recommendationPool;
+
+    const nextArticle =
+      filteredPool[Math.floor(Math.random() * filteredPool.length)];
+    lastSuggestedIdRef.current = nextArticle?.id || null;
+    return nextArticle || null;
+  }, [recommendationPool]);
+
+  useEffect(() => {
+    if (!recommendationPool.length) return undefined;
+
+    let showTimeout;
+    let hideTimeout;
+    let progressInterval;
+    let isCancelled = false;
+
+    const clearTimers = () => {
+      clearTimeout(showTimeout);
+      clearTimeout(hideTimeout);
+      clearInterval(progressInterval);
+    };
+
+    const scheduleSuggestion = (delay) => {
+      showTimeout = setTimeout(() => {
+        if (isCancelled) return;
+
+        const nextArticle = pickRandomSuggestion();
+        if (!nextArticle) return;
+
+        setSuggestedArticle(nextArticle);
+        setImageBroken(false);
+        setProgress(100);
+        setIsVisible(true);
+
+        const startedAt = Date.now();
+        progressInterval = setInterval(() => {
+          const elapsed = Date.now() - startedAt;
+          setProgress(
+            Math.max(0, 100 - (elapsed / SUGGESTION_VISIBLE_MS) * 100),
+          );
+        }, 120);
+
+        hideTimeout = setTimeout(() => {
+          clearInterval(progressInterval);
+          if (isCancelled) return;
+          setIsVisible(false);
+          setProgress(0);
+          scheduleSuggestion(SUGGESTION_HIDDEN_MS);
+        }, SUGGESTION_VISIBLE_MS);
+      }, delay);
+    };
+
+    scheduleSuggestion(SUGGESTION_INITIAL_DELAY_MS);
+
+    return () => {
+      isCancelled = true;
+      clearTimers();
+    };
+  }, [recommendationPool.length, pickRandomSuggestion]);
+
+  if (!suggestedArticle) return null;
+
+  const suggestedContent = {
+    title: suggestedArticle.title?.[locale] || suggestedArticle.title?.["en"],
+    subtitle:
+      suggestedArticle.subtitle?.[locale] || suggestedArticle.subtitle?.["en"],
+    description: stripHtml(
+      suggestedArticle.description?.[locale] ||
+        suggestedArticle.description?.["en"],
+    ),
+    slug: suggestedArticle.slug?.[locale] || suggestedArticle.slug?.["en"],
+    type:
+      suggestedArticle.type?.name?.[locale] ||
+      suggestedArticle.type?.name?.["en"],
+    image:
+      imageBroken || !suggestedArticle.image_url?.trim()
+        ? "/Home/stepn.jpg"
+        : suggestedArticle.image_url,
+  };
+
+  const hideCurrentSuggestion = () => {
+    setIsVisible(false);
+    setProgress(0);
+  };
+
+  return (
+    <div
+      className={`fixed inset-x-0 bottom-4 z-[950] px-3 transition-all duration-500 md:bottom-6 ${
+        isVisible
+          ? "translate-y-0 opacity-100"
+          : "pointer-events-none translate-y-8 opacity-0"
+      }`}
+    >
+      <div className="mx-auto w-full max-w-4xl overflow-hidden rounded-3xl border border-primary/20 bg-white shadow-[0_20px_70px_rgba(0,0,0,0.18)]">
+        <div className="h-1 w-full bg-slate-100">
+          <div
+            className="h-full bg-primary transition-[width] duration-150 ease-linear"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+        <div className="flex items-stretch gap-3 p-3 sm:gap-5 sm:p-4">
+          <Link
+            href={`/analyses/article/${suggestedContent.slug}`}
+            onClick={hideCurrentSuggestion}
+            className="group flex min-w-0 flex-1 items-center gap-3 sm:gap-5"
+          >
+            <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl bg-slate-100 sm:h-24 sm:w-28">
+              <Image
+                src={suggestedContent.image}
+                alt={suggestedContent.title || "Suggested article"}
+                fill
+                sizes="112px"
+                className="object-contain transition-transform duration-700 group-hover:scale-110"
+                onError={() => setImageBroken(true)}
+              />
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="mb-2 flex flex-wrap items-center gap-2">
+                <span className="rounded-full bg-primary/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-primary">
+                  {isRTL ? "مقترح لك" : "Suggested for you"}
+                </span>
+                {suggestedContent.type && (
+                  <span className="hidden rounded-full bg-slate-50 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-slate-400 sm:inline-flex">
+                    {suggestedContent.type}
+                  </span>
+                )}
+              </div>
+              <h3 className="line-clamp-2 text-sm font-black leading-snug text-baseTwo transition-colors group-hover:text-primary sm:text-lg">
+                {suggestedContent.title}
+              </h3>
+              {(suggestedContent.subtitle || suggestedContent.description) && (
+                <p className="mt-1 line-clamp-1 text-xs font-semibold text-slate-500 sm:text-sm">
+                  {suggestedContent.subtitle || suggestedContent.description}
+                </p>
+              )}
+            </div>
+            <div className="hidden h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary text-white transition-transform group-hover:scale-105 sm:flex">
+              {isRTL ? <FaArrowLeft /> : <FaArrowRight />}
+            </div>
+          </Link>
+          <button
+            type="button"
+            onClick={hideCurrentSuggestion}
+            aria-label={isRTL ? "إغلاق الاقتراح" : "Close suggestion"}
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-50 text-slate-400 transition-colors hover:bg-primary hover:text-white"
+          >
+            <FaTimes size={13} />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const AnalysesDetails = ({
+  article,
+  recommendedArticles = [],
+  translations,
+  locale,
+  isRTL,
+}) => {
   const router = useRouter();
   const params = useParams();
   const slug = params ? params.slug : null;
@@ -449,6 +651,12 @@ const AnalysesDetails = ({ article, translations, locale, isRTL }) => {
           </div>
         </div>
       </div>
+      <TimedArticleSuggestion
+        article={article}
+        recommendedArticles={recommendedArticles}
+        locale={locale}
+        isRTL={isRTL}
+      />
     </div>
   );
 };

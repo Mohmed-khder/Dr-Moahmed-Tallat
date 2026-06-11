@@ -1,4 +1,8 @@
-import { fetchSettings, fetchArticleDetails } from "../../../../lib/server-api";
+import {
+  fetchSettings,
+  fetchArticleDetails,
+  fetchArticlesList,
+} from "../../../../lib/server-api";
 import { getTranslations } from "next-intl/server";
 import AnalysesHeader from "../../../../AnalysesPage/AnalysesHeader";
 import AnalysesDetails from "../../../../AnalysesPage/AnalysesDetails";
@@ -74,6 +78,12 @@ const ArticleDetailsPage = async ({ params }) => {
   const isRTL = locale === "ar";
   
   const article = await fetchArticleDetails(slug);
+  const articlesData = await fetchArticlesList(null, { per_page: 12 });
+  const recommendedArticles = Array.isArray(articlesData?.data)
+    ? articlesData.data
+    : Array.isArray(articlesData)
+      ? articlesData
+      : [];
   
   const translations = {
     attachments: t("analyses.attachments"),
@@ -100,6 +110,7 @@ const ArticleDetailsPage = async ({ params }) => {
       />
       <AnalysesDetails 
         article={article} 
+        recommendedArticles={recommendedArticles}
         translations={translations} 
         locale={locale} 
         isRTL={isRTL} 
