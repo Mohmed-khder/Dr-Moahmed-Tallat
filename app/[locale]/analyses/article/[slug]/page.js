@@ -4,19 +4,22 @@ import {
   fetchArticlesList,
 } from "../../../../lib/server-api";
 import { getTranslations } from "next-intl/server";
-import AnalysesHeader from "../../../../AnalysesPage/AnalysesHeader";
+// import AnalysesHeader from "../../../../AnalysesPage/AnalysesHeader";
 import AnalysesDetails from "../../../../AnalysesPage/AnalysesDetails";
 
 function stripHtml(html) {
   if (!html) return "";
-  return html.replace(/<[^>]*>?/gm, "").replace(/\s+/g, " ").trim();
+  return html
+    .replace(/<[^>]*>?/gm, "")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 export async function generateMetadata({ params }) {
   const { locale, slug } = await params;
   const t = await getTranslations({ locale });
   const settings = await fetchSettings();
-  
+
   const article = await fetchArticleDetails(slug);
 
   const siteName = settings?.site_name
@@ -25,12 +28,17 @@ export async function generateMetadata({ params }) {
       : settings.site_name.en
     : "Dr. Mohamed Talaat";
 
-  const title = article 
-    ? (article.meta_title?.[locale] || article.meta_title?.["en"] || article.title?.[locale] || article.title?.["en"]) 
+  const title = article
+    ? article.meta_title?.[locale] ||
+      article.meta_title?.["en"] ||
+      article.title?.[locale] ||
+      article.title?.["en"]
     : t("analyses.title");
-  
+
   // Custom description logic: Meta Description or Content Snippet
-  let description = article ? (article.meta_description?.[locale] || article.meta_description?.["en"]) : null;
+  let description = article
+    ? article.meta_description?.[locale] || article.meta_description?.["en"]
+    : null;
   if (!description && article?.content?.[locale]) {
     description = stripHtml(article.content[locale]).substring(0, 160);
   }
@@ -39,7 +47,9 @@ export async function generateMetadata({ params }) {
   }
   description = description || t("navbar.seo_description");
 
-  const image = article ? (article.meta_image_url || article.image_url) : settings?.logo;
+  const image = article
+    ? article.meta_image_url || article.image_url
+    : settings?.logo;
 
   const arSlug = article?.slug?.["ar"] || article?.slug?.["en"] || slug;
   const enSlug = article?.slug?.["en"] || article?.slug?.["ar"] || slug;
@@ -76,7 +86,7 @@ const ArticleDetailsPage = async ({ params }) => {
   const { locale, slug } = await params;
   const t = await getTranslations({ locale });
   const isRTL = locale === "ar";
-  
+
   const article = await fetchArticleDetails(slug);
   const articlesData = await fetchArticlesList(null, { per_page: 12 });
   const recommendedArticles = Array.isArray(articlesData?.data)
@@ -84,7 +94,7 @@ const ArticleDetailsPage = async ({ params }) => {
     : Array.isArray(articlesData)
       ? articlesData
       : [];
-  
+
   const translations = {
     attachments: t("analyses.attachments"),
     noItems: t("analyses.noItems"),
@@ -94,26 +104,28 @@ const ArticleDetailsPage = async ({ params }) => {
       strategic_brief: t("analyses.files.strategic_brief"),
       analytical_infographic: t("analyses.files.analytical_infographic"),
       analytical_article: t("analyses.files.analytical_article"),
-    }
+    },
   };
 
-  const title = article ? (article.title?.[locale] || article.title?.["en"]) : t("analyses.title");
-  const breadcrumbCurrent = title;
+  const title = article
+    ? article.title?.[locale] || article.title?.["en"]
+    : t("analyses.title");
+  // const breadcrumbCurrent = title;
 
   return (
     <div className="analyses-details-page-container mt-20">
-      <AnalysesHeader 
+      {/* <AnalysesHeader 
         title={title}
         breadcrumbHome={t("navbar.home")}
         breadcrumbCurrent={breadcrumbCurrent}
         isRTL={isRTL}
-      />
-      <AnalysesDetails 
-        article={article} 
+      /> */}
+      <AnalysesDetails
+        article={article}
         recommendedArticles={recommendedArticles}
-        translations={translations} 
-        locale={locale} 
-        isRTL={isRTL} 
+        translations={translations}
+        locale={locale}
+        isRTL={isRTL}
       />
     </div>
   );
