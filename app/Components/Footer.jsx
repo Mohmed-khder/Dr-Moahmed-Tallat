@@ -20,10 +20,7 @@ import { subscribeNewsletter } from "../lib/server-api";
 import { useSettings } from "../Context/SettingContext";
 import { Link } from "../../i18n/routing";
 import Image from "next/image";
-import {
-  trackMetaCustomEvent,
-  trackMetaEvent,
-} from "../lib/tracking";
+import { trackMetaCustomEvent, trackMetaEvent } from "../lib/tracking";
 import { formatWhatsAppUrl } from "../lib/whatsapp";
 const Footer = () => {
   const t = useTranslations();
@@ -49,11 +46,19 @@ const Footer = () => {
   const emailList = settings?.emails || [settings?.email || t("footer.email")];
   const currentPhone = settings?.phone || t("footer.phone");
 
-  const facebookUrl = settings?.social_links?.facebook || "https://www.facebook.com/mohamedtalatabdulaziz";
-  const instagramUrl = settings?.social_links?.instagram || "https://www.instagram.com/mohamedtalatabdulaziz/";
-  const twitterUrl = settings?.social_links?.twitter || "https://x.com/mohdtalaat_gcc";
-  const linkedinUrl = settings?.social_links?.linkedin || "https://www.linkedin.com/in/mohdtalat/";
-  const youtubeUrl = settings?.social_links?.youtube || "https://www.youtube.com/@mohdtalaat";
+  const facebookUrl =
+    settings?.social_links?.facebook ||
+    "https://www.facebook.com/mohamedtalatabdulaziz";
+  const instagramUrl =
+    settings?.social_links?.instagram ||
+    "https://www.instagram.com/mohamedtalatabdulaziz/";
+  const twitterUrl =
+    settings?.social_links?.twitter || "https://x.com/mohdtalaat_gcc";
+  const linkedinUrl =
+    settings?.social_links?.linkedin ||
+    "https://www.linkedin.com/in/mohdtalat/";
+  const youtubeUrl =
+    settings?.social_links?.youtube || "https://www.youtube.com/@mohdtalaat";
   const whatsappUrl = formatWhatsAppUrl(settings?.whatsapp);
 
   // Math question generator helper function
@@ -222,9 +227,7 @@ const Footer = () => {
         try {
           const errorData = await response.json();
           errorMsg =
-            errorData?.errors?.email?.[0] ||
-            errorData?.message ||
-            errorMsg;
+            errorData?.errors?.email?.[0] || errorData?.message || errorMsg;
         } catch {
           errorMsg = t("footer.newsletterError");
         }
@@ -305,7 +308,12 @@ const Footer = () => {
               <p className="text-sm text-black/90 leading-relaxed mb-4 max-w-sm">
                 {t("footer.aboutDescription")}
               </p>
-              {(facebookUrl || instagramUrl || twitterUrl || linkedinUrl || youtubeUrl || whatsappUrl) && (
+              {(facebookUrl ||
+                instagramUrl ||
+                twitterUrl ||
+                linkedinUrl ||
+                youtubeUrl ||
+                whatsappUrl) && (
                 <div className="flex flex-wrap md:justify-start justify-center items-center gap-3 mt-6">
                   {facebookUrl && (
                     <a
@@ -495,12 +503,15 @@ const Footer = () => {
                     className="text-md flex items-center gap-2 text-black hover:text-primary transition-colors duration-200"
                   >
                     <IoLogoWhatsapp className="text-primary flex-shrink-0 w-5 h-5" />
-                    <span 
-                      dir="ltr" 
+                    <span
+                      dir="ltr"
                       className="inline-block font-sans tracking-wide"
-                      style={{ direction: 'ltr', unicodeBidi: 'isolate' }}
+                      style={{ direction: "ltr", unicodeBidi: "isolate" }}
                     >
-                      +{currentPhone.replace(/\D/g, "").replace(/^(973)(\d{4})(\d{4})$/, "$1 $2 $3")}
+                      +
+                      {currentPhone
+                        .replace(/\D/g, "")
+                        .replace(/^(973)(\d{4})(\d{4})$/, "$1 $2 $3")}
                     </span>
                   </a>
                 </li>
@@ -509,14 +520,18 @@ const Footer = () => {
                     isRTL ? "lg:justify-start" : "lg:justify-start"
                   }`}
                 >
-                  <div className={`flex flex-col gap-2 ${isRTL ? "items-center lg:items-start" : "items-center lg:items-start"}`}>
+                  <div
+                    className={`flex flex-col gap-2 ${isRTL ? "items-center lg:items-start" : "items-center lg:items-start"}`}
+                  >
                     {emailList.map((email, idx) => (
                       <a
                         key={idx}
                         href={`mailto:${email}`}
                         onClick={() => {
                           navigator.clipboard.writeText(email);
-                          toast.success(isRTL ? "تم نسخ الإيميل بنجاح!" : "Email copied!");
+                          toast.success(
+                            isRTL ? "تم نسخ الإيميل بنجاح!" : "Email copied!",
+                          );
                         }}
                         className="text-sm font-medium flex items-center gap-2 text-black/80 bg-gray-100 hover:bg-primary/10 border border-black/5 hover:border-primary/20 hover:text-primary transition-all duration-300 py-1.5 px-3 rounded-xl w-fit"
                       >
@@ -718,31 +733,31 @@ const Footer = () => {
             <div className="flex flex-wrap justify-center items-center gap-x-8 gap-y-2 mb-4  pt-6">
               <Link
                 href="/privacy"
-                className="text-sm text-black/70 hover:text-primary transition-colors"
+                className="text-md font-bold text-black/70 hover:text-primary transition-colors"
               >
                 {t("footer.privacyPolicy")}
               </Link>
               <Link
                 href="/terms-conditions"
-                className="text-sm text-black/70 hover:text-primary transition-colors"
+                className="text-md font-bold text-black/70 hover:text-primary transition-colors"
               >
                 {t("footer.termsOfService")}
               </Link>
               <Link
                 href="/ai-poilcy"
-                className="text-sm text-black/70 hover:text-primary transition-colors"
+                className="text-md font-bold text-black/70 hover:text-primary transition-colors"
               >
                 {t("footer.aiUsagePolicy")}
               </Link>
               <Link
                 href="/data-protection"
-                className="text-sm text-black/70 hover:text-primary transition-colors"
+                className="text-md font-bold text-black/70 hover:text-primary transition-colors"
               >
                 {t("footer.dataProtection")}
               </Link>
               <Link
                 href="/security-policy"
-                className="text-sm text-black/70 hover:text-primary transition-colors"
+                className="text-md font-bold text-black/70 hover:text-primary transition-colors"
               >
                 {t("footer.securityDisclosure")}
               </Link>
