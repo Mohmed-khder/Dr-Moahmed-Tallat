@@ -6,20 +6,13 @@ import { useParams } from "next/navigation";
 import {
   FaFilePdf,
   FaDownload,
-  FaRegCalendarAlt,
-  FaFacebook,
-  FaInstagram,
-  FaLinkedin,
-  FaTwitter,
   FaHistory,
   FaStar,
-  FaTags,
   FaQuoteLeft,
   FaArrowLeft,
   FaArrowRight,
   FaTimes,
 } from "react-icons/fa";
-import { GrScheduleNew } from "react-icons/gr";
 import { RiAiGenerate } from "react-icons/ri";
 import {
   HiOutlineDocumentText,
@@ -39,7 +32,10 @@ const SUGGESTION_INITIAL_DELAY_MS = 6000;
 
 function stripHtml(value) {
   if (!value) return "";
-  return value.replace(/<[^>]*>?/gm, "").replace(/\s+/g, " ").trim();
+  return value
+    .replace(/<[^>]*>?/gm, "")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 const TimedArticleSuggestion = ({
@@ -442,8 +438,13 @@ const AnalysesDetails = ({
                 </div> */}
               </div>
 
-              <div ref={containerRef} className="p-5 md:p-12 space-y-6 md:space-y-8">
-                <h2 className={`text-xl sm:text-3xl leading-4xl  md:text-5xl font-black text-baseTwo  ${isRTL ? "text-right" : "text-left"}`}>
+              <div
+                ref={containerRef}
+                className="p-5 md:p-12 space-y-6 md:space-y-8"
+              >
+                <h2
+                  className={`text-xl sm:text-3xl leading-4xl  md:text-5xl font-black text-baseTwo  ${isRTL ? "text-right" : "text-left"}`}
+                >
                   {content.title}
                 </h2>
 
@@ -462,7 +463,9 @@ const AnalysesDetails = ({
                         </h4>
                       </div>
 
-                      <div className={`relative text-slate-700 leading-[1.8] text-base md:text-lg font-medium ${isRTL ? "text-right" : "text-left"}`}>
+                      <div
+                        className={`relative text-slate-700 leading-[1.8] text-base md:text-lg font-medium ${isRTL ? "text-right" : "text-left"}`}
+                      >
                         {activeTabData.id === "article_body" ? (
                           <div
                             className={`prose prose-sm sm:prose-base md:prose-lg max-w-none text-slate-600 leading-[1.8] md:leading-[2] font-medium whitespace-pre-line ${isRTL ? "text-right" : "text-left"}`}
@@ -482,7 +485,9 @@ const AnalysesDetails = ({
                               </span>
                               <span className="font-black text-primary text-2xl uppercase tracking-widest">
                                 {content.analyticalPositioning ||
-                                  (isRTL ? "مؤشر استراتيجي" : "Strategic Index")}
+                                  (isRTL
+                                    ? "مؤشر استراتيجي"
+                                    : "Strategic Index")}
                               </span>
                             </div>
                           </div>
@@ -607,7 +612,8 @@ const AnalysesDetails = ({
                         setActiveTab(tab.id);
                         if (containerRef.current) {
                           const offset = 100; // Adjust for navbar height
-                          const bodyRect = document.body.getBoundingClientRect().top;
+                          const bodyRect =
+                            document.body.getBoundingClientRect().top;
                           const elementRect =
                             containerRef.current.getBoundingClientRect().top;
                           const elementPosition = elementRect - bodyRect;
