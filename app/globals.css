@@ -48,6 +48,52 @@ body {
   animation: gradient 3s ease infinite;
 }
 
+@keyframes loader-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes loader-spin-reverse {
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+@keyframes loader-bar {
+  0% {
+    transform: translateX(-120%);
+  }
+
+  50% {
+    transform: translateX(70%);
+  }
+
+  100% {
+    transform: translateX(230%);
+  }
+}
+
+.animate-loader-spin {
+  animation: loader-spin 1.35s linear infinite;
+}
+
+.animate-loader-spin-reverse {
+  animation: loader-spin-reverse 1.9s linear infinite;
+}
+
+.animate-loader-bar {
+  animation: loader-bar 1.45s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-loader-spin,
+  .animate-loader-spin-reverse,
+  .animate-loader-bar {
+    animation-duration: 3s;
+  }
+}
+
 
 
 

@@ -15,6 +15,7 @@ import Chatbot from "../Components/Chatbot";
 import MetaPixelTracker from "../Components/MetaPixelTracker";
 import { META_PIXEL_ID } from "../lib/tracking";
 import MaintenanceMode from "../Components/MaintenanceMode";
+import AppLoader from "../Components/AppLoader";
 
 export async function generateMetadata({ params }) {
   const resolvedParams = await params;
@@ -177,6 +178,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
                 id="site-main-content"
                 className="transition-opacity duration-1000"
               >
+                <AppLoader />
                 <ScrollToTop />
                 <Top />
                 <Navbar />
