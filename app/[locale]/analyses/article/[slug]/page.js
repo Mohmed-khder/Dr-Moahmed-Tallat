@@ -53,14 +53,16 @@ export async function generateMetadata({ params }) {
 
   const arSlug = article?.slug?.["ar"] || article?.slug?.["en"] || slug;
   const enSlug = article?.slug?.["en"] || article?.slug?.["ar"] || slug;
+  const canonicalSlug = article?.slug?.[locale] || article?.slug?.["en"] || slug;
 
   const baseUrl = "https://mohamedtalat.com";
+  const canonicalUrl = `${baseUrl}/${locale}/analyses/article/${canonicalSlug}`;
 
   return {
     title: `${title} | ${siteName}`,
     description: description,
     alternates: {
-      canonical: `${baseUrl}/${locale}/analyses/article/${slug}`,
+      canonical: canonicalUrl,
       languages: {
         ar: `${baseUrl}/ar/analyses/article/${arSlug}`,
         en: `${baseUrl}/en/analyses/article/${enSlug}`,
@@ -69,7 +71,7 @@ export async function generateMetadata({ params }) {
     openGraph: {
       title: title,
       description: description,
-      url: `${baseUrl}/${locale}/analyses/article/${slug}`,
+      url: canonicalUrl,
       type: "article",
       ...(image && { images: [image] }),
     },

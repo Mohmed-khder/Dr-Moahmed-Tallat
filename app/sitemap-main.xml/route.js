@@ -9,6 +9,15 @@ export const revalidate = 0;
 
 const baseUrl = "https://mohamedtalat.com";
 
+function escapeXml(value) {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;");
+}
+
 function generateSitemapXml(entries) {
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -16,7 +25,7 @@ function generateSitemapXml(entries) {
     .map(
       (entry) => `
   <url>
-    <loc>${entry.url}</loc>
+    <loc>${escapeXml(entry.url)}</loc>
     <lastmod>${entry.lastModified.toISOString()}</lastmod>
     <changefreq>${entry.changeFrequency}</changefreq>
     <priority>${entry.priority}</priority>
@@ -24,6 +33,28 @@ function generateSitemapXml(entries) {
     )
     .join("")}
 </urlset>`;
+}
+
+async function fetchAllArticles(typeSlug = null) {
+  const articles = [];
+  let page = 1;
+  let lastPage = 1;
+
+  do {
+    const res = await fetchArticlesList(typeSlug, { page, per_page: 100 });
+    const pageArticles = Array.isArray(res?.data)
+      ? res.data
+      : Array.isArray(res)
+        ? res
+        : [];
+
+    articles.push(...pageArticles);
+
+    lastPage = Number(res?.last_page || page);
+    page += 1;
+  } while (page <= lastPage && page <= 100);
+
+  return articles;
 }
 
 export async function GET() {
@@ -97,29 +128,34 @@ export async function GET() {
             changeFrequency: "weekly",
             priority: 0.7,
           });
-
-          // Fetch articles for this type
-          const res = await fetchArticlesList(typeSlug);
-          const articles = res?.data || [];
-          if (Array.isArray(articles)) {
-            articles.forEach((article) => {
-              const articleSlug =
-                article.slug[locale] ||
-                article.slug["en"] ||
-                article.slug["ar"];
-              if (articleSlug) {
-                analysisEntries.push({
-                  url: `${baseUrl}/${locale}/analyses/article/${articleSlug}`,
-                  lastModified,
-                  changeFrequency: "monthly",
-                  priority: 0.6,
-                });
-              }
-            });
-          }
         }
       }
     }
+
+    const articles = await fetchAllArticles();
+    const articleUrls = new Set();
+
+    articles.forEach((article) => {
+      locales.forEach((locale) => {
+        const articleSlug =
+          article.slug?.[locale] ||
+          article.slug?.["en"] ||
+          article.slug?.["ar"];
+
+        if (!articleSlug) return;
+
+        const url = `${baseUrl}/${locale}/analyses/article/${articleSlug}`;
+        if (articleUrls.has(url)) return;
+        articleUrls.add(url);
+
+        analysisEntries.push({
+          url,
+          lastModified,
+          changeFrequency: "monthly",
+          priority: 0.6,
+        });
+      });
+    });
   } catch (err) {
     console.error("Sitemap: Failed to fetch analyses", err);
   }
