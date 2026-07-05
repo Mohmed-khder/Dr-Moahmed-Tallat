@@ -12,7 +12,7 @@ const AnalysesFilter = ({ isRTL }) => {
   const isFeatured = searchParams.get("is_featured") === "1";
   const isOldValue = searchParams.get("is_old");
   const isOld = isOldValue === "1";
-  const isNew = isOldValue === "0";
+  const isNew = !isFeatured && (isOldValue === "0" || isOldValue === null);
   const initialSearch = searchParams.get("search") || "";
 
   const [searchValue, setSearchValue] = useState(initialSearch);
@@ -93,6 +93,7 @@ const AnalysesFilter = ({ isRTL }) => {
 
         {/* Filter Buttons Group */}
         <div className="flex flex-wrap items-center gap-4">
+          {false && (
           <button
             onClick={() => handleFilter("all")}
             className={`px-8 py-4 rounded-xl font-bold text-sm uppercase tracking-wider transition-all flex items-center gap-2.5 ${
@@ -106,6 +107,7 @@ const AnalysesFilter = ({ isRTL }) => {
             />
             {isRTL ? "الكل" : "All"}
           </button>
+          )}
 
           <button
             onClick={() => handleFilter("new")}

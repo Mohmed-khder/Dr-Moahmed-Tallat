@@ -16,6 +16,9 @@ import MetaPixelTracker from "../Components/MetaPixelTracker";
 import { META_PIXEL_ID } from "../lib/tracking";
 import MaintenanceMode from "../Components/MaintenanceMode";
 import AppLoader from "../Components/AppLoader";
+import Poup from "../Components/poup";
+
+const SHOW_OFFICIAL_LETTER_POPUP = true;
 
 export async function generateMetadata({ params }) {
   const resolvedParams = await params;
@@ -185,6 +188,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
                 <main>{children}</main>
                 <Footer />
                 <Chatbot />
+                {SHOW_OFFICIAL_LETTER_POPUP && <Poup />}
               </div>
             )}
           </Providers>

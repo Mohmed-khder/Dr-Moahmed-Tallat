@@ -46,6 +46,7 @@ const AnalysesAllPage = async (props) => {
 
   const { locale } = params;
   const { is_featured, is_old, page, search } = searchParams;
+  const articleAgeFilter = is_old === "1" ? "1" : "0";
 
   const t = await getTranslations({ locale });
   const isRTL = locale === "ar";
@@ -55,7 +56,7 @@ const AnalysesAllPage = async (props) => {
   // Fetch all articles (passing null/undefined for typeSlug parameter)
   const articlesData = await fetchArticlesList(null, { 
     is_featured, 
-    is_old,
+    is_old: articleAgeFilter,
     search,
     page: page || 1 
   });
