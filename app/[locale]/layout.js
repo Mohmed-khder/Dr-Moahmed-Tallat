@@ -18,7 +18,7 @@ import MaintenanceMode from "../Components/MaintenanceMode";
 import AppLoader from "../Components/AppLoader";
 import Poup from "../Components/poup";
 
-const SHOW_OFFICIAL_LETTER_POPUP = true;
+const SHOW_OFFICIAL_LETTER_POPUP = false;
 
 export async function generateMetadata({ params }) {
   const resolvedParams = await params;
@@ -107,10 +107,7 @@ export default async function RootLayout(props) {
   const isWebsiteDisabled = globalSettings?.website_enabled === false;
 
   return (
-    <html
-      lang={locale}
-      dir={locale === "ar" ? "rtl" : "ltr"}
-    >
+    <html lang={locale} dir={locale === "ar" ? "rtl" : "ltr"}>
       <head>
         {/* Google Tag Manager moves to afterInteractive via Script component */}
         <link rel="icon" href={globalSettings?.favicon || "/favicon.ico"} />
