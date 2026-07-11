@@ -6,6 +6,7 @@ import {
 import { getTranslations } from "next-intl/server";
 import AnalysesHeader from "../../../AnalysesPage/AnalysesHeader";
 import Analyses from "../../../AnalysesPage/Analyses";
+import { getCanonicalUrl, getLanguageAlternates } from "../../../lib/seo";
 
 export async function generateMetadata({ params }) {
   const { locale, type } = await params;
@@ -50,22 +51,23 @@ export async function generateMetadata({ params }) {
   const enSlug =
     currentType?.slug?.["en"] || currentType?.slug?.["ar"] || decodedType;
 
-  const baseUrl = "https://mohamedtalat.com";
+  const canonicalTypeSlug = currentType?.slug?.[locale] || decodedType;
+  const canonicalPath = `analyses/${canonicalTypeSlug}`;
 
   return {
     title: `${title} | ${siteName}`,
     description: description,
     alternates: {
-      canonical: `${baseUrl}/${locale}/analyses/${decodedType}`,
-      languages: {
-        ar: `${baseUrl}/ar/analyses/${arSlug}`,
-        en: `${baseUrl}/en/analyses/${enSlug}`,
-      },
+      canonical: getCanonicalUrl(locale, canonicalPath),
+      languages: getLanguageAlternates({
+        ar: `analyses/${arSlug}`,
+        en: `analyses/${enSlug}`,
+      }),
     },
     openGraph: {
       title: title,
       description: description,
-      url: `${baseUrl}/${locale}/analyses/${decodedType}`,
+      url: getCanonicalUrl(locale, canonicalPath),
       type: "website",
       ...(image && { images: [image] }),
     },

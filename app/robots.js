@@ -10,7 +10,14 @@ export default function robots() {
       disallow: [
         "/private/",
         "/cgi-bin/",
-        "/*?*", // Disallow query strings to avoid duplicate content in some cases
+        "/*?search=*",
+        "/*&search=*",
+        "/*?page=*",
+        "/*&page=*",
+        "/*?is_old=*",
+        "/*&is_old=*",
+        "/*?is_featured=*",
+        "/*&is_featured=*",
       ],
     },
     sitemap: `${baseUrl}/sitemap-main.xml`,

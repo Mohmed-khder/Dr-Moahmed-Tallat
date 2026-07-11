@@ -2,6 +2,7 @@ import GalleriesHeader from "@/app/GalleriesPage/GalleriesHeader";
 import Galleries from "@/app/GalleriesPage/Galleries";
 import { fetchGalleries, fetchSettings } from "@/app/lib/server-api";
 import { getTranslations } from "next-intl/server";
+import { getCanonicalUrl, getLanguageAlternates } from "@/app/lib/seo";
 
 export async function generateMetadata({ params }) {
   const { locale } = await params;
@@ -16,18 +17,17 @@ export async function generateMetadata({ params }) {
 
   const title = t("title");
 
-  const baseUrl = "https://mohamedtalat.com";
-
   return {
     title: `${title}`,
     description: t("seo_description"),
     alternates: {
-      canonical: `${baseUrl}/${locale}/galleries`,
+      canonical: getCanonicalUrl(locale, "galleries"),
+      languages: getLanguageAlternates({ ar: "galleries", en: "galleries" }),
     },
     openGraph: {
       title: title,
       description: t("seo_description"),
-      url: `${baseUrl}/${locale}/galleries`,
+      url: getCanonicalUrl(locale, "galleries"),
       type: "website",
       ...(settings?.logo && { images: [settings.logo] }),
     },

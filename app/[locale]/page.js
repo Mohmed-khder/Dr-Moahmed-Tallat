@@ -8,6 +8,7 @@ import InfinitySliderTwo from "../HomePage/InfintySliderTwo";
 import Counter from "../HomePage/Counter";
 import TallatCvServer from "../HomePage/TallatCvServer";
 import AnalysesFeatureServer from "../HomePage/AnalysesFeatureServer";
+import { getCanonicalUrl, getLanguageAlternates } from "../lib/seo";
 export async function generateMetadata({ params }) {
   const resolvedParams = await params;
   const locale = resolvedParams.locale;
@@ -36,19 +37,18 @@ export async function generateMetadata({ params }) {
     console.error("Failed to fetch global settings for Home Page SEO:", error);
   }
 
-  const baseUrl = "https://mohamedtalat.com";
-
   return {
     title: `${title} | ${t("home", { fallback: "Home" })}`,
     description: description || "Dr. Mohamed Talaat Home Page",
     keywords: keywords || "",
     alternates: {
-      canonical: `${baseUrl}/${locale}`,
+      canonical: getCanonicalUrl(locale),
+      languages: getLanguageAlternates(),
     },
     openGraph: {
       title: `${title} | ${t("home", { fallback: "Home" })}`,
       description: description || "Dr. Mohamed Talaat Home Page",
-      url: `${baseUrl}/${locale}`,
+      url: getCanonicalUrl(locale),
       ...(ogImage && { images: [ogImage] }),
       type: "website",
     },

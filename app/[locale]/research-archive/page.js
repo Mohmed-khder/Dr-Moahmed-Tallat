@@ -3,6 +3,7 @@ import { fetchSettings } from "../../lib/server-api";
 import { getTranslations } from "next-intl/server";
 import ResearchArchiveHeader from "../../ResearchArchivePage/ResearchArchiveHeader";
 import ResearchArchive from "../../ResearchArchivePage/ResearchArchive";
+import { getCanonicalUrl, getLanguageAlternates } from "../../lib/seo";
 
 export async function generateMetadata({ params }) {
   const { locale } = await params;
@@ -18,18 +19,20 @@ export async function generateMetadata({ params }) {
   const title = t("navbar.researchArchive");
   const description = t("navbar.vault.passwordSubtitle");
 
-  const baseUrl = "https://mohamedtalat.com";
-
   return {
     title: `${title}`,
     description: description,
     alternates: {
-      canonical: `${baseUrl}/${locale}/research-archive`,
+      canonical: getCanonicalUrl(locale, "research-archive"),
+      languages: getLanguageAlternates({
+        ar: "research-archive",
+        en: "research-archive",
+      }),
     },
     openGraph: {
       title: title,
       description: description,
-      url: `${baseUrl}/${locale}/research-archive`,
+      url: getCanonicalUrl(locale, "research-archive"),
       type: "website",
       ...(settings?.logo && { images: [settings.logo] }),
     },

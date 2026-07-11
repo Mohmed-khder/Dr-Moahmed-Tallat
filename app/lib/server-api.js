@@ -21,7 +21,7 @@ export async function fetchSettings() {
         "Content-Type": "application/json",
         "X-Api-Key": apiKey,
       },
-      cache: "no-store",
+      next: { revalidate: 300 },
     });
 
     if (!res.ok) return null;
@@ -44,7 +44,7 @@ export async function fetchSliders() {
         "Content-Type": "application/json",
         "X-Api-Key": apiKey,
       },
-      cache: "no-store",
+      next: { revalidate: 300 },
     });
 
     if (!res.ok) return [];
@@ -67,7 +67,7 @@ export async function fetchContactTypes() {
         "Content-Type": "application/json",
         "X-Api-Key": apiKey,
       },
-      next: { revalidate: 0 },
+      next: { revalidate: 300 },
     });
 
     if (!res.ok) return [];
@@ -135,7 +135,7 @@ export async function fetchPixelsScripts() {
         "Content-Type": "application/json",
         "X-Api-Key": apiKey,
       },
-      next: { revalidate: 0 },
+      next: { revalidate: 300 },
     });
 
     if (!res.ok) return [];
@@ -163,7 +163,7 @@ export async function fetchTestimonials(params = {}) {
         "Content-Type": "application/json",
         "X-Api-Key": apiKey,
       },
-      next: { revalidate: 0 },
+      next: { revalidate: 300 },
     });
 
     if (!res.ok) return null;
@@ -191,7 +191,7 @@ export async function fetchConferences(params = {}) {
         "Content-Type": "application/json",
         "X-Api-Key": apiKey,
       },
-      next: { revalidate: 0 },
+      next: { revalidate: 300 },
     });
 
     if (!res.ok) return null;
@@ -306,6 +306,7 @@ export async function fetchArticleDetails(slug) {
         "Content-Type": "application/json",
         "X-Api-Key": apiKey,
       },
+      next: { revalidate: 300 },
     });
     if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
     const json = await res.json();
@@ -376,6 +377,7 @@ export async function fetchPosts(params = {}) {
         "Content-Type": "application/json",
         "X-Api-Key": apiKey,
       },
+      next: { revalidate: 300 },
     });
     if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
     const json = await res.json();
@@ -423,6 +425,7 @@ export async function fetchPodcasts(params = {}) {
         "Content-Type": "application/json",
         "X-Api-Key": apiKey,
       },
+      next: { revalidate: 300 },
     });
     if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
     const json = await res.json();
@@ -448,6 +451,7 @@ export async function fetchGalleries(params = {}) {
       headers: {
         "X-Api-Key": apiKey,
       },
+      next: { revalidate: 300 },
     });
     if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
     return await res.json();

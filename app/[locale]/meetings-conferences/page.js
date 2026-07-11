@@ -3,6 +3,7 @@ import { fetchSettings, fetchConferences } from "../../lib/server-api";
 import { getTranslations } from "next-intl/server";
 import MeetingsAndConferencesHeader from "../../MeetingsAndConferencesPage/MeetingsAndConferencesHeader";
 import MeetingsAndConferences from "../../MeetingsAndConferencesPage/MeetingsAndConferences";
+import { getCanonicalUrl, getLanguageAlternates } from "../../lib/seo";
 
 export async function generateMetadata({ params }) {
   const { locale } = await params;
@@ -18,18 +19,20 @@ export async function generateMetadata({ params }) {
   const title = t("meetings.title");
   const description = t("meetings.seo_description");
 
-  const baseUrl = "https://mohamedtalat.com";
-
   return {
     title: `${title} - ${siteName}`,
     description: description,
     alternates: {
-      canonical: `${baseUrl}/${locale}/meetings-conferences`,
+      canonical: getCanonicalUrl(locale, "meetings-conferences"),
+      languages: getLanguageAlternates({
+        ar: "meetings-conferences",
+        en: "meetings-conferences",
+      }),
     },
     openGraph: {
       title: title,
       description: description,
-      url: `${baseUrl}/${locale}/meetings-conferences`,
+      url: getCanonicalUrl(locale, "meetings-conferences"),
       type: "website",
       ...(settings?.logo && { images: [settings.logo] }),
     },

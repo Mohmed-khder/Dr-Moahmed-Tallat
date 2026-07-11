@@ -2,6 +2,7 @@ import { fetchSettings } from "../../lib/server-api";
 import { getTranslations } from "next-intl/server";
 import FaqHeader from "../../FaqPage/FaqHeader";
 import FaqSection from "../../FaqPage/FaqSection";
+import { getCanonicalUrl, getLanguageAlternates } from "../../lib/seo";
 
 export async function generateMetadata({ params }) {
   const { locale } = await params;
@@ -11,18 +12,17 @@ export async function generateMetadata({ params }) {
   const title = t("faq.title");
   const description = t("faq.subtitle");
 
-  const baseUrl = "https://mohamedtalat.com";
-
   return {
     title: title,
     description: description,
     alternates: {
-      canonical: `${baseUrl}/${locale}/faq`,
+      canonical: getCanonicalUrl(locale, "faq"),
+      languages: getLanguageAlternates({ ar: "faq", en: "faq" }),
     },
     openGraph: {
       title: title,
       description: description,
-      url: `${baseUrl}/${locale}/faq`,
+      url: getCanonicalUrl(locale, "faq"),
       type: "website",
       ...(settings?.logo && { images: [settings.logo] }),
     },

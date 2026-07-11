@@ -1,5 +1,6 @@
 import StrategicForesight from "../../InformationPages/StrategicForesight";
 import { fetchPages, fetchSettings } from "../../lib/server-api";
+import { getCanonicalUrl, getLanguageAlternates } from "../../lib/seo";
 
 const fallbackData = {
   id: 15,
@@ -34,9 +35,17 @@ export async function generateMetadata({ params }) {
   return {
     title,
     description: content.substring(0, 160) || siteDescription,
+    alternates: {
+      canonical: getCanonicalUrl(locale, "strategic-foresight"),
+      languages: getLanguageAlternates({
+        ar: "strategic-foresight",
+        en: "strategic-foresight",
+      }),
+    },
     openGraph: {
       title: `${title} | ${siteTitle}`,
       description: content.substring(0, 160) || siteDescription,
+      url: getCanonicalUrl(locale, "strategic-foresight"),
       ...(ogImage && { images: [ogImage] }),
       type: "website",
     },

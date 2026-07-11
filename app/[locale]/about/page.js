@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import HeadAbout from "../../AboutPage/HeadAbout";
 import AboutTwo from "../../HomePage/AboutTwo";
 import TallatCvServer from "@/app/HomePage/TallatCvServer";
+import { getCanonicalUrl, getLanguageAlternates } from "../../lib/seo";
 
 export async function generateMetadata({ params }) {
   const { locale } = await params;
@@ -12,18 +13,17 @@ export async function generateMetadata({ params }) {
   const title = t("about.title") || t("navbar.about");
   const description = t("about.description");
 
-  const baseUrl = "https://mohamedtalat.com";
-
   return {
     title: title,
     description: description,
     alternates: {
-      canonical: `${baseUrl}/${locale}/about`,
+      canonical: getCanonicalUrl(locale, "about"),
+      languages: getLanguageAlternates({ ar: "about", en: "about" }),
     },
     openGraph: {
       title: title,
       description: description,
-      url: `${baseUrl}/${locale}/about`,
+      url: getCanonicalUrl(locale, "about"),
       type: "website",
       ...(settings?.logo && { images: [settings.logo] }),
     },

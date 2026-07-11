@@ -6,6 +6,7 @@ import {
 import { getTranslations } from "next-intl/server";
 // import AnalysesHeader from "../../../../AnalysesPage/AnalysesHeader";
 import AnalysesDetails from "../../../../AnalysesPage/AnalysesDetails";
+import { getCanonicalUrl, getLanguageAlternates } from "../../../../lib/seo";
 
 function stripHtml(html) {
   if (!html) return "";
@@ -55,18 +56,18 @@ export async function generateMetadata({ params }) {
   const enSlug = article?.slug?.["en"] || article?.slug?.["ar"] || slug;
   const canonicalSlug = article?.slug?.[locale] || article?.slug?.["en"] || slug;
 
-  const baseUrl = "https://mohamedtalat.com";
-  const canonicalUrl = `${baseUrl}/${locale}/analyses/article/${canonicalSlug}`;
+  const canonicalPath = `analyses/article/${canonicalSlug}`;
+  const canonicalUrl = getCanonicalUrl(locale, canonicalPath);
 
   return {
     title: `${title} | ${siteName}`,
     description: description,
     alternates: {
       canonical: canonicalUrl,
-      languages: {
-        ar: `${baseUrl}/ar/analyses/article/${arSlug}`,
-        en: `${baseUrl}/en/analyses/article/${enSlug}`,
-      },
+      languages: getLanguageAlternates({
+        ar: `analyses/article/${arSlug}`,
+        en: `analyses/article/${enSlug}`,
+      }),
     },
     openGraph: {
       title: title,

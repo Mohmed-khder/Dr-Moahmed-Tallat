@@ -1,5 +1,6 @@
 import PoliticalMandate from "../../InformationPages/PoliticalMandate";
 import { fetchPages, fetchSettings } from "../../lib/server-api";
+import { getCanonicalUrl, getLanguageAlternates } from "../../lib/seo";
 
 const fallbackData = {
   id: 14,
@@ -34,9 +35,17 @@ export async function generateMetadata({ params }) {
   return {
     title,
     description: content.substring(0, 160) || siteDescription,
+    alternates: {
+      canonical: getCanonicalUrl(locale, "political-mandate"),
+      languages: getLanguageAlternates({
+        ar: "political-mandate",
+        en: "political-mandate",
+      }),
+    },
     openGraph: {
       title: `${title} | ${siteTitle}`,
       description: content.substring(0, 160) || siteDescription,
+      url: getCanonicalUrl(locale, "political-mandate"),
       ...(ogImage && { images: [ogImage] }),
       type: "website",
     },

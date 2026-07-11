@@ -17,8 +17,15 @@ import { META_PIXEL_ID } from "../lib/tracking";
 import MaintenanceMode from "../Components/MaintenanceMode";
 import AppLoader from "../Components/AppLoader";
 import Poup from "../Components/poup";
+import {
+  getCanonicalUrl,
+  getLanguageAlternates,
+  SITE_URL,
+} from "../lib/seo";
 
 const SHOW_OFFICIAL_LETTER_POPUP = false;
+
+export const revalidate = 300;
 
 export async function generateMetadata({ params }) {
   const resolvedParams = await params;
@@ -35,10 +42,8 @@ export async function generateMetadata({ params }) {
     }
   } catch (err) {}
 
-  const baseUrl = "https://mohamedtalat.com";
-
   return {
-    metadataBase: new URL(baseUrl),
+    metadataBase: new URL(SITE_URL),
     title: {
       template: `${siteName} | %s`,
       default: siteName,
@@ -54,14 +59,11 @@ export async function generateMetadata({ params }) {
       statusBarStyle: "default",
     },
     alternates: {
-      canonical: `${baseUrl}/${locale}`,
-      languages: {
-        ar: `${baseUrl}/ar`,
-        en: `${baseUrl}/en`,
-      },
+      canonical: getCanonicalUrl(locale),
+      languages: getLanguageAlternates(),
     },
     openGraph: {
-      url: `${baseUrl}/${locale}`,
+      url: getCanonicalUrl(locale),
       siteName: siteName,
       locale: locale === "ar" ? "ar_AR" : "en_US",
       type: "website",
@@ -102,7 +104,6 @@ export default async function RootLayout(props) {
   } catch (err) {
     console.error("Failed to fetch global settings in root layout", err);
   }
-  const baseUrl = "https://mohamedtalat.com";
   const siteName = globalSettings?.site_name?.[locale] || "Dr. Mohamed Talaat";
   const isWebsiteDisabled = globalSettings?.website_enabled === false;
 
@@ -119,8 +120,8 @@ export default async function RootLayout(props) {
               "@context": "https://schema.org",
               "@type": "Organization",
               name: siteName,
-              url: `${baseUrl}/${locale}`,
-              logo: `${baseUrl}/Home/talaat-logo.png`,
+              url: getCanonicalUrl(locale),
+              logo: `${SITE_URL}/Home/talaat-logo.png`,
             }),
           }}
         />

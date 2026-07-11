@@ -1,6 +1,7 @@
 import LinkTree from "../../Components/LinkTree";
 import { fetchSettings } from "../../lib/server-api";
 import { getTranslations } from "next-intl/server";
+import { getCanonicalUrl, getLanguageAlternates } from "../../lib/seo";
 
 export async function generateMetadata({ params }) {
   const { locale } = await params;
@@ -10,18 +11,17 @@ export async function generateMetadata({ params }) {
   const description =
     settings?.site_description?.en || t("contactForm.description");
 
-  const baseUrl = "https://mohamedtalat.com";
-
   return {
     title: t("linkTree.title", "Links"),
     description: description,
     alternates: {
-      canonical: `${baseUrl}/${locale}/links`,
+      canonical: getCanonicalUrl(locale, "links"),
+      languages: getLanguageAlternates({ ar: "links", en: "links" }),
     },
     openGraph: {
       title: t("linkTree.title", "Links"),
       description: description,
-      url: `${baseUrl}/${locale}/links`,
+      url: getCanonicalUrl(locale, "links"),
       type: "website",
       ...(settings?.logo && { images: [settings.logo] }),
     },

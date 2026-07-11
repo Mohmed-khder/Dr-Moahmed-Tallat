@@ -1,5 +1,6 @@
 import OperationalParadigm from "../../InformationPages/OperationalParadigm";
 import { fetchPages, fetchSettings } from "../../lib/server-api";
+import { getCanonicalUrl, getLanguageAlternates } from "../../lib/seo";
 
 const fallbackData = {
   id: 13,
@@ -34,9 +35,17 @@ export async function generateMetadata({ params }) {
   return {
     title,
     description: content.substring(0, 160) || siteDescription,
+    alternates: {
+      canonical: getCanonicalUrl(locale, "operational-paradigm"),
+      languages: getLanguageAlternates({
+        ar: "operational-paradigm",
+        en: "operational-paradigm",
+      }),
+    },
     openGraph: {
       title: `${title} | ${siteTitle}`,
       description: content.substring(0, 160) || siteDescription,
+      url: getCanonicalUrl(locale, "operational-paradigm"),
       ...(ogImage && { images: [ogImage] }),
       type: "website",
     },

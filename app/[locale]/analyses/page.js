@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import AnalysesHeader from "../../AnalysesPage/AnalysesHeader";
 import Analyses from "../../AnalysesPage/Analyses";
 import AnalysesFilter from "../../AnalysesPage/AnalysesFilter";
+import { getCanonicalUrl, getLanguageAlternates } from "../../lib/seo";
 
 export async function generateMetadata({ params }) {
   const { locale } = await params;
@@ -18,17 +19,16 @@ export async function generateMetadata({ params }) {
 
   const title = t("navbar.allAnalyses");
 
-  const baseUrl = "https://mohamedtalat.com";
-
   return {
     title: `${title} | ${siteName}`,
     description: t("navbar.seo_description"),
     alternates: {
-      canonical: `${baseUrl}/${locale}/analyses`,
+      canonical: getCanonicalUrl(locale, "analyses"),
+      languages: getLanguageAlternates({ ar: "analyses", en: "analyses" }),
     },
     openGraph: {
       title: title,
-      url: `${baseUrl}/${locale}/analyses`,
+      url: getCanonicalUrl(locale, "analyses"),
       type: "website",
       ...(settings?.logo && { images: [settings.logo] }),
     },

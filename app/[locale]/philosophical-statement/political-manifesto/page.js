@@ -1,5 +1,6 @@
 import PoliticalManifesto from "../../../InformationPages/PoliticalManifesto";
 import { fetchPages, fetchSettings } from "../../../lib/server-api";
+import { getCanonicalUrl, getLanguageAlternates } from "../../../lib/seo";
 
 export async function generateMetadata({ params }) {
   const { locale } = await params;
@@ -16,9 +17,23 @@ export async function generateMetadata({ params }) {
   return {
     title,
     description: content.substring(0, 160) || siteDescription,
+    alternates: {
+      canonical: getCanonicalUrl(
+        locale,
+        "philosophical-statement/political-manifesto",
+      ),
+      languages: getLanguageAlternates({
+        ar: "philosophical-statement/political-manifesto",
+        en: "philosophical-statement/political-manifesto",
+      }),
+    },
     openGraph: {
       title: `${title} | ${siteTitle}`,
       description: content.substring(0, 160) || siteDescription,
+      url: getCanonicalUrl(
+        locale,
+        "philosophical-statement/political-manifesto",
+      ),
       ...(ogImage && { images: [ogImage] }),
       type: "website",
     },

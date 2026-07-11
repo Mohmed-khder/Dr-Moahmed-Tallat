@@ -8,6 +8,22 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 const baseUrl = "https://mohamedtalat.com";
+const defaultLastModified = new Date("2026-07-11T00:00:00.000Z");
+
+function getLastModified(source, fallback = defaultLastModified) {
+  const value =
+    source?.updated_at ||
+    source?.updatedAt ||
+    source?.published_at ||
+    source?.publishedAt ||
+    source?.created_at ||
+    source?.createdAt;
+
+  if (!value) return fallback;
+
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? fallback : date;
+}
 
 function escapeXml(value) {
   return String(value)
@@ -59,7 +75,6 @@ async function fetchAllArticles(typeSlug = null) {
 
 export async function GET() {
   const locales = ["ar", "en"];
-  const lastModified = new Date();
 
   // 1. Static Routes
   const staticPaths = [
@@ -79,7 +94,7 @@ export async function GET() {
     staticPaths.forEach((path) => {
       staticEntries.push({
         url: `${baseUrl}/${locale}${path}`,
-        lastModified,
+        lastModified: defaultLastModified,
         changeFrequency: "weekly",
         priority: path === "" ? 1.0 : 0.8,
       });
@@ -104,7 +119,7 @@ export async function GET() {
       if (slugValue) {
         infoPageEntries.push({
           url: `${baseUrl}/${locale}/${slugValue}`,
-          lastModified,
+          lastModified: getLastModified(page),
           changeFrequency: "monthly",
           priority: 0.6,
         });
@@ -124,7 +139,7 @@ export async function GET() {
         if (typeSlug) {
           analysisEntries.push({
             url: `${baseUrl}/${locale}/analyses/${typeSlug}`,
-            lastModified,
+            lastModified: getLastModified(type),
             changeFrequency: "weekly",
             priority: 0.7,
           });
@@ -150,7 +165,7 @@ export async function GET() {
 
         analysisEntries.push({
           url,
-          lastModified,
+          lastModified: getLastModified(article),
           changeFrequency: "monthly",
           priority: 0.6,
         });

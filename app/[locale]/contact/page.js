@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import HeadContact from "../../ContactPage/HeadContact";
 import ContactForm from "../../ContactPage/ContactForm";
 import Map from "../../ContactPage/Map";
+import { getCanonicalUrl, getLanguageAlternates } from "../../lib/seo";
 export async function generateMetadata({ params }) {
   const { locale } = await params;
   const t = await getTranslations({ locale });
@@ -11,18 +12,17 @@ export async function generateMetadata({ params }) {
   const title = t("headContact.title");
   const description = t("contactForm.description");
 
-  const baseUrl = "https://mohamedtalat.com";
-
   return {
     title: title,
     description: description,
     alternates: {
-      canonical: `${baseUrl}/${locale}/contact`,
+      canonical: getCanonicalUrl(locale, "contact"),
+      languages: getLanguageAlternates({ ar: "contact", en: "contact" }),
     },
     openGraph: {
       title: title,
       description: description,
-      url: `${baseUrl}/${locale}/contact`,
+      url: getCanonicalUrl(locale, "contact"),
       type: "website",
       ...(settings?.logo && { images: [settings.logo] }),
     },

@@ -1,5 +1,6 @@
 import PrivacyPolicy from "../../InformationPages/PrivacyPolicy";
 import { fetchPages, fetchSettings } from "../../lib/server-api";
+import { getCanonicalUrl, getLanguageAlternates } from "../../lib/seo";
 
 export async function generateMetadata({ params }) {
   const { locale } = await params;
@@ -16,9 +17,14 @@ export async function generateMetadata({ params }) {
   return {
     title,
     description: content.substring(0, 160) || siteDescription,
+    alternates: {
+      canonical: getCanonicalUrl(locale, "privacy"),
+      languages: getLanguageAlternates({ ar: "privacy", en: "privacy" }),
+    },
     openGraph: {
       title: `${title} | ${siteTitle}`,
       description: content.substring(0, 160) || siteDescription,
+      url: getCanonicalUrl(locale, "privacy"),
       ...(ogImage && { images: [ogImage] }),
       type: "website",
     },

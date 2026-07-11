@@ -1,5 +1,6 @@
 import FoundingManifesto from "../../InformationPages/FoundingManifesto";
 import { fetchPages, fetchSettings } from "../../lib/server-api";
+import { getCanonicalUrl, getLanguageAlternates } from "../../lib/seo";
 
 const fallbackData = {
   id: 12,
@@ -36,9 +37,17 @@ export async function generateMetadata({ params }) {
   return {
     title,
     description: content.substring(0, 160) || siteDescription,
+    alternates: {
+      canonical: getCanonicalUrl(locale, "founding-manifesto"),
+      languages: getLanguageAlternates({
+        ar: "founding-manifesto",
+        en: "founding-manifesto",
+      }),
+    },
     openGraph: {
       title: `${title} | ${siteTitle}`,
       description: content.substring(0, 160) || siteDescription,
+      url: getCanonicalUrl(locale, "founding-manifesto"),
       ...(ogImage && { images: [ogImage] }),
       type: "website",
     },

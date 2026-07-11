@@ -3,6 +3,7 @@ import { fetchSettings, fetchTestimonials } from "../../lib/server-api";
 import { getTranslations } from "next-intl/server";
 import QuotationsHeader from "../../QuotationsPage/QuotationsHeader";
 import Quotations from "../../QuotationsPage/Quotations";
+import { getCanonicalUrl, getLanguageAlternates } from "../../lib/seo";
 
 export async function generateMetadata({ params }) {
   const { locale } = await params;
@@ -18,18 +19,17 @@ export async function generateMetadata({ params }) {
   const title = t("quotations.title");
   const description = t("quotations.seo_description") || t("quotations.title");
 
-  const baseUrl = "https://mohamedtalat.com";
-
   return {
     title: `${title} - ${siteName}`,
     description: description,
     alternates: {
-      canonical: `${baseUrl}/${locale}/quotations`,
+      canonical: getCanonicalUrl(locale, "quotations"),
+      languages: getLanguageAlternates({ ar: "quotations", en: "quotations" }),
     },
     openGraph: {
       title: title,
       description: description,
-      url: `${baseUrl}/${locale}/quotations`,
+      url: getCanonicalUrl(locale, "quotations"),
       type: "website",
       ...(settings?.logo && { images: [settings.logo] }),
     },

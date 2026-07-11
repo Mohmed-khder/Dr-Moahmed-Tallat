@@ -4,6 +4,7 @@ export default createMiddleware({
   locales: ["ar", "en"],
   defaultLocale: "ar",
   redirectOnRoot: true,
+  alternateLinks: false,
 });
 
 export const config = {

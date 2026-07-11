@@ -1,5 +1,6 @@
 import PhilosophicalStatement from "../../InformationPages/PhilosophicalStatement";
 import { fetchPages, fetchSettings } from "../../lib/server-api";
+import { getCanonicalUrl, getLanguageAlternates } from "../../lib/seo";
 
 export async function generateMetadata({ params }) {
   const { locale } = await params;
@@ -16,9 +17,17 @@ export async function generateMetadata({ params }) {
   return {
     title,
     description: content.substring(0, 160) || siteDescription,
+    alternates: {
+      canonical: getCanonicalUrl(locale, "philosophical-statement"),
+      languages: getLanguageAlternates({
+        ar: "philosophical-statement",
+        en: "philosophical-statement",
+      }),
+    },
     openGraph: {
       title: `${title} | ${siteTitle}`,
       description: content.substring(0, 160) || siteDescription,
+      url: getCanonicalUrl(locale, "philosophical-statement"),
       ...(ogImage && { images: [ogImage] }),
       type: "website",
     },

@@ -2,6 +2,7 @@ import PodcastsHeader from "@/app/podcastsPage/PodcastsHeader";
 import Podcasts from "@/app/podcastsPage/Podcasts";
 import { fetchPodcasts, fetchSettings } from "@/app/lib/server-api";
 import { getTranslations } from "next-intl/server";
+import { getCanonicalUrl, getLanguageAlternates } from "@/app/lib/seo";
 
 export async function generateMetadata({ params }) {
   const { locale } = await params;
@@ -16,18 +17,17 @@ export async function generateMetadata({ params }) {
 
   const title = t("title");
 
-  const baseUrl = "https://mohamedtalat.com";
-
   return {
     title: `${title}`,
     description: t("seo_description"),
     alternates: {
-      canonical: `${baseUrl}/${locale}/podcasts`,
+      canonical: getCanonicalUrl(locale, "podcasts"),
+      languages: getLanguageAlternates({ ar: "podcasts", en: "podcasts" }),
     },
     openGraph: {
       title: title,
       description: t("seo_description"),
-      url: `${baseUrl}/${locale}/podcasts`,
+      url: getCanonicalUrl(locale, "podcasts"),
       type: "website",
       ...(settings?.logo && { images: [settings.logo] }),
     },

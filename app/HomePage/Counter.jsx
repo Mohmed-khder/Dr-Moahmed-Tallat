@@ -1,32 +1,25 @@
 "use client";
-import React, { useEffect, useRef } from "react";
-import { useTranslations, useLocale } from "next-intl";
+import React, { useEffect, useMemo, useRef } from "react";
+import { useTranslations } from "next-intl";
 import { motion, useInView, useSpring, useTransform } from "framer-motion";
 
 const CounterItem = ({ value, label, hasPlus = true }) => {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
-
-  // Extract number from string if it has a plus (e.g. "150+" -> 150)
-  const numericValue = parseInt(value) || 0;
-
-  // Slower spring animation
-  const springValue = useSpring(0, {
-    stiffness: 40,
-    damping: 20,
+  const isInView = useInView(ref, { once: true, margin: "-80px" });
+  const numericValue = useMemo(() => parseInt(value, 10) || 0, [value]);
+  const startValue = numericValue > 0 ? 1 : 0;
+  const springValue = useSpring(startValue, {
+    stiffness: 70,
+    damping: 18,
     restDelta: 0.001,
   });
-
   const displayValue = useTransform(springValue, (latest) =>
-    Math.round(latest),
+    Math.max(startValue, Math.round(latest)),
   );
 
   useEffect(() => {
     if (isInView) {
-      const timeout = setTimeout(() => {
-        springValue.set(numericValue);
-      }, 300); // Slight delay for better UX
-      return () => clearTimeout(timeout);
+      springValue.set(numericValue);
     }
   }, [isInView, numericValue, springValue]);
 
@@ -36,7 +29,13 @@ const CounterItem = ({ value, label, hasPlus = true }) => {
       className="flex flex-col items-center justify-center text-center"
     >
       <div className="flex items-center gap-1 group">
-        <motion.span className="text-6xl md:text-8xl font-black text-primary transition-transform duration-500 group-hover:scale-110">
+        <motion.span
+          initial={{ opacity: 0, y: 14 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.55, ease: "easeOut" }}
+          className="text-6xl md:text-8xl font-black text-primary transition-transform duration-500 group-hover:scale-110"
+        >
           {displayValue}
         </motion.span>
         {hasPlus && (
@@ -56,8 +55,6 @@ const CounterItem = ({ value, label, hasPlus = true }) => {
 
 const Counter = () => {
   const t = useTranslations("counter");
-  const locale = useLocale();
-  const isRTL = locale === "ar";
 
   const counters = [
     {

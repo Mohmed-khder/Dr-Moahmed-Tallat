@@ -1,5 +1,6 @@
 import SovereignManifesto from "../../InformationPages/SovereignManifesto";
 import { fetchPages, fetchSettings } from "../../lib/server-api";
+import { getCanonicalUrl, getLanguageAlternates } from "../../lib/seo";
 
 const fallbackData = {
   id: 11,
@@ -36,9 +37,17 @@ export async function generateMetadata({ params }) {
   return {
     title,
     description: content.substring(0, 160) || siteDescription,
+    alternates: {
+      canonical: getCanonicalUrl(locale, "sovereign-manifesto"),
+      languages: getLanguageAlternates({
+        ar: "sovereign-manifesto",
+        en: "sovereign-manifesto",
+      }),
+    },
     openGraph: {
       title: `${title} | ${siteTitle}`,
       description: content.substring(0, 160) || siteDescription,
+      url: getCanonicalUrl(locale, "sovereign-manifesto"),
       ...(ogImage && { images: [ogImage] }),
       type: "website",
     },

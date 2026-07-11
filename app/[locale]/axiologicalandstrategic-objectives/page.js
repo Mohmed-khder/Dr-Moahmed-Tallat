@@ -1,5 +1,6 @@
 import AxiologicalandStrategicObjectives from "../../InformationPages/AxiologicalandStrategicObjectives";
 import { fetchPages, fetchSettings } from "../../lib/server-api";
+import { getCanonicalUrl, getLanguageAlternates } from "../../lib/seo";
 
 export async function generateMetadata({ params }) {
   const { locale } = await params;
@@ -16,9 +17,17 @@ export async function generateMetadata({ params }) {
   return {
     title,
     description: content.substring(0, 160) || siteDescription,
+    alternates: {
+      canonical: getCanonicalUrl(locale, "axiologicalandstrategic-objectives"),
+      languages: getLanguageAlternates({
+        ar: "axiologicalandstrategic-objectives",
+        en: "axiologicalandstrategic-objectives",
+      }),
+    },
     openGraph: {
       title: `${title} | ${siteTitle}`,
       description: content.substring(0, 160) || siteDescription,
+      url: getCanonicalUrl(locale, "axiologicalandstrategic-objectives"),
       ...(ogImage && { images: [ogImage] }),
       type: "website",
     },
