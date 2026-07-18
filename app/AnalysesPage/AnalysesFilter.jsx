@@ -17,6 +17,13 @@ const AnalysesFilter = ({ isRTL }) => {
 
   const [searchValue, setSearchValue] = useState(initialSearch);
 
+  const pushAndRefresh = (href) => {
+    router.push(href, { scroll: false });
+    window.setTimeout(() => {
+      router.refresh();
+    }, 0);
+  };
+
   useEffect(() => {
     setSearchValue(searchParams.get("search") || "");
   }, [searchParams]);
@@ -35,7 +42,7 @@ const AnalysesFilter = ({ isRTL }) => {
       params.set("is_old", "0");
     }
 
-    router.push(`${pathname}?${params.toString()}`, { scroll: false });
+    pushAndRefresh(`${pathname}?${params.toString()}`);
   };
 
   const handleSearchSubmit = (e) => {
@@ -47,7 +54,7 @@ const AnalysesFilter = ({ isRTL }) => {
     } else {
       params.delete("search");
     }
-    router.push(`${pathname}?${params.toString()}`, { scroll: false });
+    pushAndRefresh(`${pathname}?${params.toString()}`);
   };
 
   const clearSearch = () => {
@@ -55,7 +62,7 @@ const AnalysesFilter = ({ isRTL }) => {
     const params = new URLSearchParams(searchParams.toString());
     params.delete("search");
     params.delete("page");
-    router.push(`${pathname}?${params.toString()}`, { scroll: false });
+    pushAndRefresh(`${pathname}?${params.toString()}`);
   };
 
   return (

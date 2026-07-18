@@ -8,6 +8,24 @@ import AnalysesHeader from "../../../AnalysesPage/AnalysesHeader";
 import Analyses from "../../../AnalysesPage/Analyses";
 import { getCanonicalUrl, getLanguageAlternates } from "../../../lib/seo";
 
+function getLocalizedSlug(slug, locale) {
+  if (!slug) return "";
+  if (typeof slug === "string") return slug;
+  return slug?.[locale] || slug?.["en"] || slug?.["ar"] || "";
+}
+
+function typeMatchesSlug(articleType, decodedType, locale) {
+  if (typeof articleType.slug === "string") {
+    return articleType.slug === decodedType;
+  }
+
+  return (
+    articleType.slug?.[locale] === decodedType ||
+    articleType.slug?.["en"] === decodedType ||
+    articleType.slug?.["ar"] === decodedType
+  );
+}
+
 export async function generateMetadata({ params }) {
   const { locale, type } = await params;
   const t = await getTranslations({ locale });
@@ -16,12 +34,7 @@ export async function generateMetadata({ params }) {
 
   // Find the type to get its metadata
   const types = await fetchArticleTypes();
-  const currentType = types.find(
-    (t) =>
-      t.slug?.[locale] === decodedType ||
-      t.slug?.["en"] === decodedType ||
-      t.slug?.["ar"] === decodedType,
-  );
+  const currentType = types.find((t) => typeMatchesSlug(t, decodedType, locale));
 
   const siteName = settings?.site_name
     ? locale === "ar"
@@ -46,12 +59,16 @@ export async function generateMetadata({ params }) {
   const image =
     currentType?.meta_image_url || currentType?.image_url || settings?.logo;
 
-  const arSlug =
-    currentType?.slug?.["ar"] || currentType?.slug?.["en"] || decodedType;
-  const enSlug =
-    currentType?.slug?.["en"] || currentType?.slug?.["ar"] || decodedType;
+  const arSlug = currentType
+    ? getLocalizedSlug(currentType.slug, "ar")
+    : decodedType;
+  const enSlug = currentType
+    ? getLocalizedSlug(currentType.slug, "en")
+    : decodedType;
 
-  const canonicalTypeSlug = currentType?.slug?.[locale] || decodedType;
+  const canonicalTypeSlug = currentType
+    ? getLocalizedSlug(currentType.slug, locale)
+    : decodedType;
   const canonicalPath = `analyses/${canonicalTypeSlug}`;
 
   return {
@@ -91,12 +108,7 @@ const AnalysesListPage = async (props) => {
   const decodedType = decodeURIComponent(type);
 
   const types = await fetchArticleTypes();
-  const currentType = types.find(
-    (t) =>
-      t.slug?.[locale] === decodedType ||
-      t.slug?.["en"] === decodedType ||
-      t.slug?.["ar"] === decodedType,
-  );
+  const currentType = types.find((t) => typeMatchesSlug(t, decodedType, locale));
 
   const fallbackName = decodedType
     ? decodedType.replace(/-/g, " ")
@@ -106,7 +118,7 @@ const AnalysesListPage = async (props) => {
     : fallbackName;
 
   const articlesData = await fetchArticlesList(
-    currentType?.slug?.[locale] || currentType?.slug?.["en"] || decodedType,
+    currentType ? getLocalizedSlug(currentType.slug, locale) : decodedType,
     { page: page || 1, search },
   );
 

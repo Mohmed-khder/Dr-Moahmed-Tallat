@@ -19,6 +19,12 @@ import {
 } from "react-icons/fa";
 import { GrScheduleNew } from "react-icons/gr";
 
+function getLocalizedSlug(slug, locale) {
+  if (!slug) return "";
+  if (typeof slug === "string") return slug;
+  return slug?.[locale] || slug?.["en"] || slug?.["ar"] || "";
+}
+
 const Analyses = ({
   articles,
   pagination,
@@ -36,7 +42,7 @@ const Analyses = ({
 
   useEffect(() => {
     if (!currentType || !type) return;
-    const correctSlug = currentType.slug?.[locale] || currentType.slug?.["en"];
+    const correctSlug = getLocalizedSlug(currentType.slug, locale);
     const decodedCorrect = correctSlug ? decodeURIComponent(correctSlug) : "";
     const decodedCurrent = decodeURIComponent(type);
     if (decodedCorrect && decodedCorrect !== decodedCurrent) {
@@ -54,6 +60,9 @@ const Analyses = ({
     router.push(`${pathname}?${currentParams.toString()}`, {
       scroll: false,
     });
+    window.setTimeout(() => {
+      router.refresh();
+    }, 0);
 
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -89,7 +98,7 @@ const Analyses = ({
             : "We're currently preparing new analytical content. Please check back soon or explore the archive."
         }
         ctaLabel={isRTL ? "كافة التحليلات" : "Explore Archive"}
-        ctaHref="/analyses"
+        ctaHref="/analyses?is_old=1"
         isRTL={isRTL}
       />
     );

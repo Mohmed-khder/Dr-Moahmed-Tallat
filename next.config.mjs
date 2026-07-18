@@ -23,8 +23,60 @@ const nextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: "/:locale(ar|en)/articles-columns",
+        destination: "/:locale/analyses",
+        permanent: true,
+      },
+      {
+        source: "/:locale(ar|en)/articles-columns/:path*",
+        destination: "/:locale/analyses",
+        permanent: true,
+      },
+      {
+        source: "/:locale(ar|en)/talaat-cv",
+        destination: "/:locale",
+        permanent: true,
+      },
+      {
+        source: "/:locale(ar|en)/talaat-cv/:path*",
+        destination: "/:locale",
+        permanent: true,
+      },
+      {
+        source: "/:locale(ar|en)/ai-poilcy",
+        destination: "/:locale/ai-policy",
+        permanent: true,
+      },
+      {
+        source: "/:locale(ar|en)/ai-poilcy/:path*",
+        destination: "/:locale/ai-policy",
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
+      {
+        source: "/:locale(ar|en)/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "no-cache, must-revalidate",
+          },
+        ],
+      },
+      {
+        source: "/api/nav-data",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "no-store, max-age=0",
+          },
+        ],
+      },
       {
         source: "/(.*)",
         headers: [

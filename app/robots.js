@@ -14,8 +14,6 @@ export default function robots() {
         "/*&search=*",
         "/*?page=*",
         "/*&page=*",
-        "/*?is_old=*",
-        "/*&is_old=*",
         "/*?is_featured=*",
         "/*&is_featured=*",
       ],

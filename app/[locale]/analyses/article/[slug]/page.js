@@ -4,6 +4,7 @@ import {
   fetchArticlesList,
 } from "../../../../lib/server-api";
 import { getTranslations } from "next-intl/server";
+import { notFound } from "next/navigation";
 // import AnalysesHeader from "../../../../AnalysesPage/AnalysesHeader";
 import AnalysesDetails from "../../../../AnalysesPage/AnalysesDetails";
 import { getCanonicalUrl, getLanguageAlternates } from "../../../../lib/seo";
@@ -18,10 +19,13 @@ function stripHtml(html) {
 
 export async function generateMetadata({ params }) {
   const { locale, slug } = await params;
+  const article = await fetchArticleDetails(slug);
+  if (!article) {
+    notFound();
+  }
+
   const t = await getTranslations({ locale });
   const settings = await fetchSettings();
-
-  const article = await fetchArticleDetails(slug);
 
   const siteName = settings?.site_name
     ? locale === "ar"
@@ -29,17 +33,15 @@ export async function generateMetadata({ params }) {
       : settings.site_name.en
     : "Dr. Mohamed Talaat";
 
-  const title = article
-    ? article.meta_title?.[locale] ||
-      article.meta_title?.["en"] ||
-      article.title?.[locale] ||
-      article.title?.["en"]
-    : t("analyses.title");
+  const title =
+    article.meta_title?.[locale] ||
+    article.meta_title?.["en"] ||
+    article.title?.[locale] ||
+    article.title?.["en"];
 
   // Custom description logic: Meta Description or Content Snippet
-  let description = article
-    ? article.meta_description?.[locale] || article.meta_description?.["en"]
-    : null;
+  let description =
+    article.meta_description?.[locale] || article.meta_description?.["en"];
   if (!description && article?.content?.[locale]) {
     description = stripHtml(article.content[locale]).substring(0, 160);
   }
@@ -48,9 +50,7 @@ export async function generateMetadata({ params }) {
   }
   description = description || t("navbar.seo_description");
 
-  const image = article
-    ? article.meta_image_url || article.image_url
-    : settings?.logo;
+  const image = article.meta_image_url || article.image_url || settings?.logo;
 
   const arSlug = article?.slug?.["ar"] || article?.slug?.["en"] || slug;
   const enSlug = article?.slug?.["en"] || article?.slug?.["ar"] || slug;
@@ -91,6 +91,10 @@ const ArticleDetailsPage = async ({ params }) => {
   const isRTL = locale === "ar";
 
   const article = await fetchArticleDetails(slug);
+  if (!article) {
+    notFound();
+  }
+
   const articlesData = await fetchArticlesList(null, { per_page: 12 });
   const recommendedArticles = Array.isArray(articlesData?.data)
     ? articlesData.data
@@ -110,9 +114,6 @@ const ArticleDetailsPage = async ({ params }) => {
     },
   };
 
-  const title = article
-    ? article.title?.[locale] || article.title?.["en"]
-    : t("analyses.title");
   // const breadcrumbCurrent = title;
 
   return (

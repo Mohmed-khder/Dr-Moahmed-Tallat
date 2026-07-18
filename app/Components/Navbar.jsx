@@ -177,6 +177,12 @@ const Navbar = () => {
     setIsLangDropdownOpen(false);
   };
 
+  const getLocalizedSlug = (slug) => {
+    if (!slug) return "";
+    if (typeof slug === "string") return slug;
+    return slug?.[locale] || slug?.["en"] || slug?.["ar"] || "";
+  };
+
   const navLinks = [
     { to: "/", label: t("navbar.home") },
     {
@@ -242,11 +248,11 @@ const Navbar = () => {
           label: t("navbar.allAnalyses", "All Analyses"),
         },
         ...articleTypes.map((type) => ({
-          to: `/analyses/${type.slug?.[locale] || type.slug?.["en"] || ""}`,
+          to: `/analyses/${getLocalizedSlug(type.slug)}`,
           label: type.name?.[locale] || type.name?.["en"] || "",
           children:
             type.children?.map((child) => ({
-              to: `/analyses/${child.slug?.[locale] || child.slug?.["en"] || ""}`,
+              to: `/analyses/${getLocalizedSlug(child.slug)}`,
               label: child.name?.[locale] || child.name?.["en"] || "",
             })) || [],
         })),

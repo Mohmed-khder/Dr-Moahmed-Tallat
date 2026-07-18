@@ -9,6 +9,12 @@ export const revalidate = 0;
 
 const baseUrl = "https://mohamedtalat.com";
 const defaultLastModified = new Date("2026-07-11T00:00:00.000Z");
+const excludedInfoPageSlugs = new Set([
+  "research-archive",
+  "talaat-cv",
+  "articles-columns",
+  "ai-poilcy",
+]);
 
 function getLastModified(source, fallback = defaultLastModified) {
   const value =
@@ -81,12 +87,12 @@ export async function GET() {
     "",
     "/about",
     "/contact",
+    "/ai-policy",
     "/analyses",
     "/galleries",
     "/podcasts",
     "/quotations",
     "/meetings-conferences",
-    "/research-archive",
   ];
 
   const staticEntries = [];
@@ -116,7 +122,7 @@ export async function GET() {
         typeof page.slug === "string"
           ? page.slug
           : page.slug[locale] || page.slug["en"] || page.slug["ar"];
-      if (slugValue) {
+      if (slugValue && !excludedInfoPageSlugs.has(slugValue)) {
         infoPageEntries.push({
           url: `${baseUrl}/${locale}/${slugValue}`,
           lastModified: getLastModified(page),
