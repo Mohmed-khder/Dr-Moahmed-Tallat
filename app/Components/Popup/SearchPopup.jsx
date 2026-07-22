@@ -10,9 +10,9 @@ import {
   FiClock,
 } from "react-icons/fi";
 import { useLocale, useTranslations } from "next-intl";
-import { Link, useRouter } from "../../i18n/routing";
+import { Link, useRouter } from "../../../i18n/routing";
 import Image from "next/image";
-import { fetchArticlesList } from "../lib/server-api";
+import { fetchArticlesList } from "../../lib/server-api";
 
 const SearchPopup = ({ isOpen, onClose }) => {
   const [query, setQuery] = useState("");

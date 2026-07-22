@@ -1,8 +1,9 @@
 "use client";
 import React from "react";
 import Image from "next/image";
-import { Link } from "../../i18n/routing";
+import { Link, useRouter } from "../../i18n/routing";
 import { useLocale } from "next-intl";
+import NewsletterGatePopup from "../Components/Popup/NewsletterGatePopup";
 import {
   FaRegCalendarAlt,
   FaArrowRight,
@@ -16,8 +17,36 @@ import {
 
 const AnalysesFeature = ({ articles, translations }) => {
   const locale = useLocale();
+  const router = useRouter();
   const isRTL = locale === "ar";
   const [brokenImages, setBrokenImages] = React.useState({});
+  const [newsletterGateOpen, setNewsletterGateOpen] = React.useState(false);
+  const [pendingArticleHref, setPendingArticleHref] = React.useState("");
+
+  const handleArticleClick = (event, href) => {
+    if (typeof window === "undefined") return;
+    if (sessionStorage.getItem("newsletter-article-gate-done") === "1") {
+      return;
+    }
+
+    event.preventDefault();
+    setPendingArticleHref(href);
+    setNewsletterGateOpen(true);
+  };
+
+  const handleNewsletterSuccess = () => {
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("newsletter-article-gate-done", "1");
+    }
+
+    const href = pendingArticleHref;
+    setNewsletterGateOpen(false);
+    setPendingArticleHref("");
+
+    if (href) {
+      router.push(href);
+    }
+  };
 
   if (!articles || articles.length === 0) return null;
 
@@ -109,7 +138,12 @@ const AnalysesFeature = ({ articles, translations }) => {
                     <span>{article.published_at}</span>
                   </div> */}
 
-                  <Link href={`/analyses/article/${slug}`}>
+                  <Link
+                    href={`/analyses/article/${slug}`}
+                    onClick={(event) =>
+                      handleArticleClick(event, `/analyses/article/${slug}`)
+                    }
+                  >
                     <h3 className="text-xl font-black text-baseTwo mb-3 line-clamp-2 leading-tight hover:text-primary transition-colors cursor-pointer group-hover:translate-x-1 rtl:group-hover:-translate-x-1 transition-transform duration-300">
                       {title}
                     </h3>
@@ -124,6 +158,9 @@ const AnalysesFeature = ({ articles, translations }) => {
                   <div className="mt-auto pt-6 border-t border-slate-50 flex items-center justify-between">
                     <Link
                       href={`/analyses/article/${slug}`}
+                      onClick={(event) =>
+                        handleArticleClick(event, `/analyses/article/${slug}`)
+                      }
                       className="flex items-center gap-2 group/btn"
                     >
                       <span className="text-xs font-black text-baseTwo uppercase tracking-widest border-b border-transparent group-hover/btn:border-primary group-hover/btn:text-primary transition-all">
@@ -157,6 +194,12 @@ const AnalysesFeature = ({ articles, translations }) => {
           </Link>
         </div>
       </div>
+      <NewsletterGatePopup
+        isOpen={newsletterGateOpen}
+        onClose={() => setNewsletterGateOpen(false)}
+        onSuccess={handleNewsletterSuccess}
+        isRTL={isRTL}
+      />
     </section>
   );
 };

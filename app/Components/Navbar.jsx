@@ -8,8 +8,8 @@ import { useVault } from "../Context/VaultContext";
 import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 import { FaPaperPlane, FaChevronDown, FaLock } from "react-icons/fa";
 import Image from "next/image";
-import VaultModal from "./VaultModal";
-import SearchPopup from "./SearchPopup";
+import VaultModal from "./Popup/VaultModal";
+import SearchPopup from "./Popup/SearchPopup";
 import { FiSearch } from "react-icons/fi";
 
 // US Flag Component (Using UK flag as per user change)

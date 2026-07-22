@@ -1,8 +1,8 @@
 "use client";
 import React, { useState } from "react";
 import { useTranslations } from "next-intl";
-import { useVault } from "../Context/VaultContext";
-import { useRouter } from "../../i18n/routing";
+import { useVault } from "../../Context/VaultContext";
+import { useRouter } from "../../../i18n/routing";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 import { RiSafe2Fill, RiGitRepositoryPrivateFill } from "react-icons/ri";

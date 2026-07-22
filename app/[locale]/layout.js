@@ -16,14 +16,10 @@ import MetaPixelTracker from "../Components/MetaPixelTracker";
 import { META_PIXEL_ID } from "../lib/tracking";
 import MaintenanceMode from "../Components/MaintenanceMode";
 import AppLoader from "../Components/AppLoader";
-import Poup from "../Components/poup";
-import {
-  getCanonicalUrl,
-  getLanguageAlternates,
-  SITE_URL,
-} from "../lib/seo";
+import LegalDisclaimerPopup from "../Components/Popup/LegalDisclaimerPopup";
+import { getCanonicalUrl, getLanguageAlternates, SITE_URL } from "../lib/seo";
 
-const SHOW_OFFICIAL_LETTER_POPUP = false;
+const SHOW_OFFICIAL_LETTER_POPUP = true;
 
 export const revalidate = 300;
 
@@ -186,7 +182,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
                 <main>{children}</main>
                 <Footer />
                 <Chatbot />
-                {SHOW_OFFICIAL_LETTER_POPUP && <Poup />}
+                {SHOW_OFFICIAL_LETTER_POPUP && <LegalDisclaimerPopup />}
               </div>
             )}
           </Providers>

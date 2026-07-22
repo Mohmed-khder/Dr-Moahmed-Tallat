@@ -104,17 +104,19 @@ export async function submitContactForm(formData) {
  */
 export async function subscribeNewsletter(email, phone) {
   try {
-    const res = await fetch(`${baseUrl}/subscribe`, {
+    const endpoint = isServer ? `${baseUrl}/subscribe` : "/api/subscribe";
+    const res = await fetch(endpoint, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "X-Api-Key": apiKey,
+        ...(isServer ? { "X-Api-Key": apiKey } : {}),
       },
       body: JSON.stringify({
         email: email.trim(),
         phone: phone?.trim() || "",
         extra_key: null,
       }),
+      cache: "no-store",
     });
 
     return res;

@@ -4,6 +4,7 @@ import Image from "next/image";
 import { Link, useRouter, usePathname } from "../../i18n/routing";
 import { useParams, useSearchParams } from "next/navigation";
 import ApiEmptyState from "../Components/ApiEmptyState";
+import NewsletterGatePopup from "../Components/Popup/NewsletterGatePopup";
 import {
   MdOutlineKeyboardDoubleArrowRight,
   MdOutlineKeyboardDoubleArrowLeft,
@@ -39,6 +40,8 @@ const Analyses = ({
   const pathname = usePathname();
   const type = params ? params.type : null;
   const [brokenImages, setBrokenImages] = React.useState({});
+  const [newsletterGateOpen, setNewsletterGateOpen] = React.useState(false);
+  const [pendingArticleHref, setPendingArticleHref] = React.useState("");
 
   useEffect(() => {
     if (!currentType || !type) return;
@@ -65,6 +68,31 @@ const Analyses = ({
     }, 0);
 
     window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleArticleClick = (event, href) => {
+    if (typeof window === "undefined") return;
+    if (sessionStorage.getItem("newsletter-article-gate-done") === "1") {
+      return;
+    }
+
+    event.preventDefault();
+    setPendingArticleHref(href);
+    setNewsletterGateOpen(true);
+  };
+
+  const handleNewsletterSuccess = () => {
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("newsletter-article-gate-done", "1");
+    }
+
+    const href = pendingArticleHref;
+    setNewsletterGateOpen(false);
+    setPendingArticleHref("");
+
+    if (href) {
+      router.push(href);
+    }
   };
 
   if (!articles || articles.length === 0) {
@@ -203,7 +231,15 @@ const Analyses = ({
                     </div>
                   </div> */}
 
-                  <Link href={`/analyses/article/${articleSlug}`}>
+                  <Link
+                    href={`/analyses/article/${articleSlug}`}
+                    onClick={(event) =>
+                      handleArticleClick(
+                        event,
+                        `/analyses/article/${articleSlug}`,
+                      )
+                    }
+                  >
                     <h3 className="text-xl font-black text-baseTwo mb-3 line-clamp-2 leading-tight hover:text-primary transition-colors cursor-pointer group-hover:text-primary decoration-primary/30 underline-offset-8 decoration-2 group-hover:underline">
                       {title}
                     </h3>
@@ -222,6 +258,12 @@ const Analyses = ({
                   <div className="mt-auto pt-8 border-t border-slate-50 flex items-center justify-between">
                     <Link
                       href={`/analyses/article/${articleSlug}`}
+                      onClick={(event) =>
+                        handleArticleClick(
+                          event,
+                          `/analyses/article/${articleSlug}`,
+                        )
+                      }
                       className="flex items-center gap-4 group/btn"
                     >
                       <span className="text-xs font-black text-baseTwo uppercase tracking-[0.15em] transition-colors border-b-2 border-transparent group-hover/btn:border-primary group-hover/btn:text-primary">
@@ -335,6 +377,12 @@ const Analyses = ({
           </div>
         )}
       </div>
+      <NewsletterGatePopup
+        isOpen={newsletterGateOpen}
+        onClose={() => setNewsletterGateOpen(false)}
+        onSuccess={handleNewsletterSuccess}
+        isRTL={isRTL}
+      />
     </div>
   );
 };
