@@ -17,6 +17,21 @@ function stripHtml(html) {
     .trim();
 }
 
+function getLocalizedSlug(slug, locale) {
+  if (!slug) return "";
+  if (typeof slug === "string") return slug;
+  return slug?.[locale] || slug?.["en"] || slug?.["ar"] || "";
+}
+
+function getArticleTypeSlug(article, locale) {
+  return (
+    getLocalizedSlug(article?.type?.slug, locale) ||
+    article?.type_slug ||
+    article?.article_type_slug ||
+    getLocalizedSlug(article?.article_type?.slug, locale)
+  );
+}
+
 export async function generateMetadata({ params }) {
   const { locale, slug } = await params;
   const article = await fetchArticleDetails(slug);
@@ -95,7 +110,10 @@ const ArticleDetailsPage = async ({ params }) => {
     notFound();
   }
 
-  const articlesData = await fetchArticlesList(null, { per_page: 12 });
+  const articleTypeSlug = getArticleTypeSlug(article, locale);
+  const articlesData = await fetchArticlesList(articleTypeSlug || null, {
+    per_page: 12,
+  });
   const recommendedArticles = Array.isArray(articlesData?.data)
     ? articlesData.data
     : Array.isArray(articlesData)
