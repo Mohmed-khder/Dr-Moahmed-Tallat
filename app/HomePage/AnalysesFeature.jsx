@@ -5,6 +5,10 @@ import { Link, useRouter } from "../../i18n/routing";
 import { useLocale } from "next-intl";
 import NewsletterGatePopup from "../Components/Popup/NewsletterGatePopup";
 import {
+  ENABLE_NEWSLETTER_GATE_POPUP,
+  NEWSLETTER_GATE_STORAGE_KEY,
+} from "../Components/Popup/newsletterGateConfig";
+import {
   FaRegCalendarAlt,
   FaArrowRight,
   FaArrowLeft,
@@ -25,7 +29,10 @@ const AnalysesFeature = ({ articles, translations }) => {
 
   const handleArticleClick = (event, href) => {
     if (typeof window === "undefined") return;
-    if (sessionStorage.getItem("newsletter-article-gate-done") === "1") {
+    if (
+      !ENABLE_NEWSLETTER_GATE_POPUP ||
+      localStorage.getItem(NEWSLETTER_GATE_STORAGE_KEY) === "1"
+    ) {
       return;
     }
 
@@ -36,7 +43,7 @@ const AnalysesFeature = ({ articles, translations }) => {
 
   const handleNewsletterSuccess = () => {
     if (typeof window !== "undefined") {
-      sessionStorage.setItem("newsletter-article-gate-done", "1");
+      localStorage.setItem(NEWSLETTER_GATE_STORAGE_KEY, "1");
     }
 
     const href = pendingArticleHref;
@@ -194,12 +201,14 @@ const AnalysesFeature = ({ articles, translations }) => {
           </Link>
         </div>
       </div>
-      <NewsletterGatePopup
-        isOpen={newsletterGateOpen}
-        onClose={() => setNewsletterGateOpen(false)}
-        onSuccess={handleNewsletterSuccess}
-        isRTL={isRTL}
-      />
+      {ENABLE_NEWSLETTER_GATE_POPUP && (
+        <NewsletterGatePopup
+          isOpen={newsletterGateOpen}
+          onClose={() => setNewsletterGateOpen(false)}
+          onSuccess={handleNewsletterSuccess}
+          isRTL={isRTL}
+        />
+      )}
     </section>
   );
 };

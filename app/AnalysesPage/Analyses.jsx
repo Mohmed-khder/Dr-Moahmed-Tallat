@@ -6,6 +6,10 @@ import { useParams, useSearchParams } from "next/navigation";
 import ApiEmptyState from "../Components/ApiEmptyState";
 import NewsletterGatePopup from "../Components/Popup/NewsletterGatePopup";
 import {
+  ENABLE_NEWSLETTER_GATE_POPUP,
+  NEWSLETTER_GATE_STORAGE_KEY,
+} from "../Components/Popup/newsletterGateConfig";
+import {
   MdOutlineKeyboardDoubleArrowRight,
   MdOutlineKeyboardDoubleArrowLeft,
 } from "react-icons/md";
@@ -72,7 +76,10 @@ const Analyses = ({
 
   const handleArticleClick = (event, href) => {
     if (typeof window === "undefined") return;
-    if (sessionStorage.getItem("newsletter-article-gate-done") === "1") {
+    if (
+      !ENABLE_NEWSLETTER_GATE_POPUP ||
+      localStorage.getItem(NEWSLETTER_GATE_STORAGE_KEY) === "1"
+    ) {
       return;
     }
 
@@ -83,7 +90,7 @@ const Analyses = ({
 
   const handleNewsletterSuccess = () => {
     if (typeof window !== "undefined") {
-      sessionStorage.setItem("newsletter-article-gate-done", "1");
+      localStorage.setItem(NEWSLETTER_GATE_STORAGE_KEY, "1");
     }
 
     const href = pendingArticleHref;
@@ -377,12 +384,14 @@ const Analyses = ({
           </div>
         )}
       </div>
-      <NewsletterGatePopup
-        isOpen={newsletterGateOpen}
-        onClose={() => setNewsletterGateOpen(false)}
-        onSuccess={handleNewsletterSuccess}
-        isRTL={isRTL}
-      />
+      {ENABLE_NEWSLETTER_GATE_POPUP && (
+        <NewsletterGatePopup
+          isOpen={newsletterGateOpen}
+          onClose={() => setNewsletterGateOpen(false)}
+          onSuccess={handleNewsletterSuccess}
+          isRTL={isRTL}
+        />
+      )}
     </div>
   );
 };
