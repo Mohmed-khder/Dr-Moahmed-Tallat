@@ -19,7 +19,7 @@ import AppLoader from "../Components/AppLoader";
 import LegalDisclaimerPopup from "../Components/Popup/LegalDisclaimerPopup";
 import { getCanonicalUrl, getLanguageAlternates, SITE_URL } from "../lib/seo";
 
-const SHOW_OFFICIAL_LETTER_POPUP = true;
+const SHOW_OFFICIAL_LETTER_POPUP = false;
 
 export const revalidate = 300;
 
