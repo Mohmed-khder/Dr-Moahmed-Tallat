@@ -5,10 +5,17 @@ import { useVault } from "../Context/VaultContext";
 import { useRouter, usePathname } from "../../i18n/routing";
 import { useSearchParams } from "next/navigation";
 import { useTranslations, useLocale } from "next-intl";
-import { FaFilePdf, FaDownload, FaLock, FaShieldAlt } from "react-icons/fa";
-import { RiSafe2Fill } from "react-icons/ri";
+import { FaEye, FaFilePdf, FaShieldAlt } from "react-icons/fa";
 import { motion } from "framer-motion";
 import ApiEmptyState from "../Components/ApiEmptyState";
+
+const getReadableFileUrl = (file) => {
+  const url = file?.preview_url || file?.view_url || file?.download_url || "";
+  if (!url) return "";
+
+  const separator = url.includes("#") ? "&" : "#";
+  return `${url}${separator}toolbar=0&navpanes=0&scrollbar=1&statusbar=0&messages=0`;
+};
 
 const FileSkeleton = () => {
   return (
@@ -51,7 +58,8 @@ const PaginationSkeleton = () => {
 };
 
 const ResearchArchive = () => {
-  const { isUnlocked, vaultData, isInitializing } = useVault();
+  const { isUnlocked, vaultData, isInitializing, loading, refreshVault } =
+    useVault();
   const [previewUrl, setPreviewUrl] = useState(null);
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -59,6 +67,7 @@ const ResearchArchive = () => {
   const t = useTranslations("navbar");
   const locale = useLocale();
   const isRTL = locale === "ar";
+  const currentPage = Number(searchParams.get("page") || 1);
 
   // Redirect if not unlocked (after initialization)
   useEffect(() => {
@@ -66,6 +75,12 @@ const ResearchArchive = () => {
       router.push("/");
     }
   }, [isInitializing, isUnlocked, router]);
+
+  useEffect(() => {
+    if (!isInitializing && isUnlocked) {
+      refreshVault(currentPage);
+    }
+  }, [currentPage, isInitializing, isUnlocked, refreshVault]);
 
   const handlePageChange = (page) => {
     const currentParams = new URLSearchParams(
@@ -80,7 +95,7 @@ const ResearchArchive = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  if (isInitializing) {
+  if (isInitializing || (loading && !vaultData)) {
     return (
       <div className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -135,15 +150,6 @@ const ResearchArchive = () => {
                     <FaShieldAlt className="text-primary text-xs" />
                     <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">
                       {t("vault.authorizedOnly")}
-                    </span>
-                  </div>
-
-                  <div
-                    className={`inline-flex items-center gap-2 px-4 py-2 bg-gray-50 border border-gray-200 rounded-full ${isRTL ? "flex-row-reverse" : ""}`}
-                  >
-                    <div className="w-1.5 h-1.5 bg-gray-400 rounded-full" />
-                    <span className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em]">
-                      {t("vault.citationStandard")}
                     </span>
                   </div>
                 </div>
@@ -240,19 +246,16 @@ const ResearchArchive = () => {
                       </div>
                       <div className="flex items-center gap-2">
                         <button
-                          onClick={() => setPreviewUrl(file.download_url)}
+                          type="button"
+                          onClick={() =>
+                            setPreviewUrl(getReadableFileUrl(file))
+                          }
+                          disabled={!getReadableFileUrl(file)}
                           className="flex items-center gap-2 px-4 py-2.5 bg-primary/10 text-primary text-xs font-black rounded-xl hover:bg-primary hover:text-white transition-all"
                         >
+                          <FaEye className="text-[10px]" />
                           <span>{t("vault.view")}</span>
                         </button>
-                        <a
-                          href={file.download_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-2 px-4 py-2.5 bg-baseTwo text-white text-xs font-black rounded-xl hover:bg-primary transition-all group-hover:shadow-lg group-hover:shadow-primary/20"
-                        >
-                          <FaDownload className="text-[10px]" />
-                        </a>
                       </div>
                     </div>
                   </div>
@@ -284,7 +287,11 @@ const ResearchArchive = () => {
                     let l;
 
                     for (let i = 1; i <= last; i++) {
-                      if (i === 1 || i === last || (i >= current - delta && i <= current + delta)) {
+                      if (
+                        i === 1 ||
+                        i === last ||
+                        (i >= current - delta && i <= current + delta)
+                      ) {
                         range.push(i);
                       }
                     }
@@ -294,7 +301,7 @@ const ResearchArchive = () => {
                         if (i - l === 2) {
                           rangeWithDots.push(l + 1);
                         } else if (i - l !== 1) {
-                          rangeWithDots.push('...');
+                          rangeWithDots.push("...");
                         }
                       }
                       rangeWithDots.push(i);
@@ -303,7 +310,7 @@ const ResearchArchive = () => {
 
                     return rangeWithDots.map((p, index) => (
                       <React.Fragment key={index}>
-                        {p === '...' ? (
+                        {p === "..." ? (
                           <span className="w-10 h-10 flex items-center justify-center text-slate-400 font-bold">
                             ...
                           </span>
@@ -350,7 +357,10 @@ const ResearchArchive = () => {
 
         {/* PDF Preview Modal */}
         {previewUrl && (
-          <div className="fixed inset-0 z-2000 flex items-center justify-center p-4 md:p-10">
+          <div
+            className="fixed inset-0 z-2000 flex items-center justify-center p-4 md:p-10"
+            onContextMenu={(event) => event.preventDefault()}
+          >
             <div
               className="absolute inset-0 bg-black/80 backdrop-blur-sm"
               onClick={() => setPreviewUrl(null)}

@@ -2,6 +2,7 @@ import {
   fetchSettings,
   fetchArticleDetails,
   fetchArticlesList,
+  fetchArticleTypes,
 } from "../../../../lib/server-api";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
@@ -30,6 +31,97 @@ function getArticleTypeSlug(article, locale) {
     article?.article_type_slug ||
     getLocalizedSlug(article?.article_type?.slug, locale)
   );
+}
+
+function getArticleParentTypeSlug(article, locale) {
+  return (
+    getLocalizedSlug(article?.type?.parent?.slug, locale) ||
+    getLocalizedSlug(article?.parent_type?.slug, locale) ||
+    getLocalizedSlug(article?.article_type?.parent?.slug, locale) ||
+    article?.parent_type_slug ||
+    ""
+  );
+}
+
+function getSlugValues(slug) {
+  if (!slug) return [];
+  if (typeof slug === "string") return [slug];
+  return Object.values(slug).filter(Boolean);
+}
+
+function slugMatches(slug, targetSlug) {
+  if (!targetSlug) return false;
+  return getSlugValues(slug).some((value) => value === targetSlug);
+}
+
+function getArticleTypeIds(article) {
+  return [
+    article?.type?.id,
+    article?.article_type?.id,
+    article?.type_id,
+    article?.article_type_id,
+  ].filter(Boolean);
+}
+
+function typeMatchesArticle(type, targetSlug, targetIds) {
+  return (
+    slugMatches(type?.slug, targetSlug) ||
+    (type?.id && targetIds.includes(type.id))
+  );
+}
+
+function findRootArticleType(types, article, targetSlug) {
+  if (!targetSlug || !Array.isArray(types)) return null;
+
+  const targetIds = getArticleTypeIds(article);
+
+  for (const type of types) {
+    if (typeMatchesArticle(type, targetSlug, targetIds)) return type;
+
+    const children = Array.isArray(type?.children) ? type.children : [];
+    const isChildMatch = children.some((child) =>
+      typeMatchesArticle(child, targetSlug, targetIds),
+    );
+
+    if (isChildMatch) return type;
+  }
+
+  return null;
+}
+
+function getTypeFamilySlugs(type, locale) {
+  if (!type) return [];
+
+  const family = [
+    getLocalizedSlug(type?.slug, locale),
+    ...(Array.isArray(type?.children)
+      ? type.children.map((child) => getLocalizedSlug(child?.slug, locale))
+      : []),
+  ];
+
+  return [...new Set(family.filter(Boolean))];
+}
+
+function normalizeArticlesData(articlesData) {
+  if (Array.isArray(articlesData?.data)) return articlesData.data;
+  if (Array.isArray(articlesData)) return articlesData;
+  return [];
+}
+
+function uniqueArticles(articles) {
+  const seen = new Set();
+
+  return articles.filter((article) => {
+    const key =
+      article?.id ||
+      article?.slug?.["en"] ||
+      article?.slug?.["ar"] ||
+      JSON.stringify(article?.slug);
+
+    if (!key || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }
 
 export async function generateMetadata({ params }) {
@@ -111,14 +203,31 @@ const ArticleDetailsPage = async ({ params }) => {
   }
 
   const articleTypeSlug = getArticleTypeSlug(article, locale);
-  const articlesData = await fetchArticlesList(articleTypeSlug || null, {
-    per_page: 12,
-  });
-  const recommendedArticles = Array.isArray(articlesData?.data)
-    ? articlesData.data
-    : Array.isArray(articlesData)
-      ? articlesData
-      : [];
+  const directParentTypeSlug = getArticleParentTypeSlug(article, locale);
+  const articleTypes = await fetchArticleTypes();
+  const rootArticleType = findRootArticleType(
+    articleTypes,
+    article,
+    directParentTypeSlug || articleTypeSlug,
+  );
+  const recommendationTypeSlugs = getTypeFamilySlugs(
+    rootArticleType,
+    locale,
+  );
+
+  const recommendationRequests = recommendationTypeSlugs.length
+    ? recommendationTypeSlugs
+    : [articleTypeSlug].filter(Boolean);
+
+  const recommendationResponses = await Promise.all(
+    recommendationRequests.map((typeSlug) =>
+      fetchArticlesList(typeSlug, { per_page: 12 }),
+    ),
+  );
+
+  const recommendedArticles = uniqueArticles(
+    recommendationResponses.flatMap(normalizeArticlesData),
+  ).slice(0, 12);
 
   const translations = {
     attachments: t("analyses.attachments"),

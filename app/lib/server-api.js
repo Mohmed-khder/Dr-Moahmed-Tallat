@@ -210,13 +210,18 @@ export async function fetchConferences(params = {}) {
  */
 export async function accessVault(password, page = 1) {
   try {
-    const res = await fetch(`${baseUrl}/vault/access?page=${page}`, {
+    const endpoint = isServer
+      ? `${baseUrl}/vault/access?page=${page}`
+      : `/api/vault/access?page=${page}`;
+
+    const res = await fetch(endpoint, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "X-Api-Key": apiKey,
+        ...(isServer ? { "X-Api-Key": apiKey } : {}),
       },
       body: JSON.stringify({ password }),
+      cache: "no-store",
     });
 
     if (!res.ok) {
