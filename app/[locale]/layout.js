@@ -23,6 +23,23 @@ const SHOW_OFFICIAL_LETTER_POPUP = false;
 
 export const revalidate = 300;
 
+function isSettingEnabled(value) {
+  if (value === undefined || value === null) return true;
+  if (typeof value === "boolean") return value;
+  if (typeof value === "number") return value === 1;
+  if (typeof value === "string") {
+    const normalized = value.trim().toLowerCase();
+    if (["1", "true", "enabled", "active", "on"].includes(normalized)) {
+      return true;
+    }
+    if (["0", "false", "disabled", "inactive", "off"].includes(normalized)) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 export async function generateMetadata({ params }) {
   const resolvedParams = await params;
   const locale = resolvedParams.locale;
@@ -31,7 +48,7 @@ export async function generateMetadata({ params }) {
   let favicon = "/favicon.ico";
 
   try {
-    const settings = await fetchSettings();
+    const settings = await fetchSettings({ cache: "no-store" });
     if (settings) {
       siteName = settings.site_name?.[locale] || siteName;
       favicon = settings.favicon || favicon;
@@ -96,12 +113,12 @@ export default async function RootLayout(props) {
   // Fetch global settings once on the server side to eliminate redundant client requests
   let globalSettings = null;
   try {
-    globalSettings = await fetchSettings();
+    globalSettings = await fetchSettings({ cache: "no-store" });
   } catch (err) {
     console.error("Failed to fetch global settings in root layout", err);
   }
   const siteName = globalSettings?.site_name?.[locale] || "Dr. Mohamed Talaat";
-  const isWebsiteDisabled = globalSettings?.website_enabled === false;
+  const isWebsiteDisabled = !isSettingEnabled(globalSettings?.website_enabled);
 
   return (
     <html lang={locale} dir={locale === "ar" ? "rtl" : "ltr"}>

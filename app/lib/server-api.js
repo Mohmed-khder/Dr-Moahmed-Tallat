@@ -13,15 +13,20 @@ function logApiError(label, err) {
 /**
  * Fetch generic global website settings from backend
  */
-export async function fetchSettings() {
+export async function fetchSettings(options = {}) {
   try {
+    const fetchOptions =
+      options.cache === "no-store"
+        ? { cache: "no-store" }
+        : { next: { revalidate: 300 } };
+
     const res = await fetch(`${baseUrl}/settings`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
         "X-Api-Key": apiKey,
       },
-      next: { revalidate: 300 },
+      ...fetchOptions,
     });
 
     if (!res.ok) return null;
