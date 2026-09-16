@@ -12,6 +12,8 @@ import {
   FaArrowLeft,
   FaArrowRight,
   FaTimes,
+  FaHandPointRight,
+  FaHandPointLeft,
 } from "react-icons/fa";
 import { RiAiGenerate } from "react-icons/ri";
 import {
@@ -25,6 +27,7 @@ import {
 } from "react-icons/hi";
 import { BiBullseye } from "react-icons/bi";
 import TalatAIChat from "./TalatAIChat";
+import FormTest from "./FormTest";
 
 const SUGGESTION_VISIBLE_MS = 15000;
 const SUGGESTION_HIDDEN_MS = 180000;
@@ -66,8 +69,8 @@ const TimedArticleSuggestion = ({
     const filteredPool =
       recommendationPool.length > 1
         ? recommendationPool.filter(
-            (item) => item.id !== lastSuggestedIdRef.current,
-          )
+          (item) => item.id !== lastSuggestedIdRef.current,
+        )
         : recommendationPool;
 
     const nextArticle =
@@ -136,7 +139,7 @@ const TimedArticleSuggestion = ({
       suggestedArticle.subtitle?.[locale] || suggestedArticle.subtitle?.["en"],
     description: stripHtml(
       suggestedArticle.description?.[locale] ||
-        suggestedArticle.description?.["en"],
+      suggestedArticle.description?.["en"],
     ),
     slug: suggestedArticle.slug?.[locale] || suggestedArticle.slug?.["en"],
     type:
@@ -155,11 +158,10 @@ const TimedArticleSuggestion = ({
 
   return (
     <div
-      className={`fixed inset-x-0 bottom-4 z-[950] px-3 transition-all duration-500 md:bottom-6 ${
-        isVisible
+      className={`fixed inset-x-0 bottom-4 z-[950] px-3 transition-all duration-500 md:bottom-6 ${isVisible
           ? "translate-y-0 opacity-100"
           : "pointer-events-none translate-y-8 opacity-0"
-      }`}
+        }`}
     >
       <div className="mx-auto w-full max-w-4xl overflow-hidden rounded-3xl border border-primary/20 bg-white shadow-[0_20px_70px_rgba(0,0,0,0.18)]">
         <div className="h-1 w-full bg-slate-100">
@@ -234,6 +236,7 @@ const AnalysesDetails = ({
   const slug = params ? params.slug : null;
   const [imageBroken, setImageBroken] = React.useState(false);
   const [activeTab, setActiveTab] = React.useState(null);
+  const [showFormTest, setShowFormTest] = React.useState(false);
   const containerRef = React.useRef(null);
 
   useEffect(() => {
@@ -419,11 +422,10 @@ const AnalysesDetails = ({
                   alt={content.title || "Article Image"}
                   fill
                   priority
-                  className={`group-hover:scale-105 transition-transform duration-1000 ${
-                    heroImageSrc === "/Home/stepn.jpg"
+                  className={`group-hover:scale-105 transition-transform duration-1000 ${heroImageSrc === "/Home/stepn.jpg"
                       ? "object-contain"
                       : "object-contain"
-                  }`}
+                    }`}
                   onError={() => setImageBroken(true)}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-40" />
@@ -447,6 +449,27 @@ const AnalysesDetails = ({
                 >
                   {content.title}
                 </h2>
+                {/* FORM TEST BUTTON */}
+
+                {content.title && content.title.includes("تعدد العلاقات") && (
+                  <div className="flex justify-start items-center gap-4">
+                    <button
+                      onClick={() => setShowFormTest(true)}
+                      className="group flex items-center gap-4 bg-gradient-to-r from-[#d8b56b] to-[#aa803a] text-[#071321] px-6 py-4 md:px-8 md:py-5 rounded-[1.5rem] font-black text-base md:text-xl shadow-[0_10px_30px_rgba(216,181,107,0.3)] hover:shadow-[0_15px_40px_rgba(216,181,107,0.4)] transition-all duration-300 hover:-translate-y-1 relative overflow-hidden"
+                    >
+                      <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out" />
+                      <HiOutlineClipboardCheck className="text-2xl md:text-3xl relative z-10" />
+                      <span className="relative z-10">
+                        {isRTL ? "ابدأ استبيان بنيان للتأمل" : "Start Bunyan Questionnaire"}
+                      </span>
+                    </button>
+                    
+                    <div className="text-[#d8b56b] text-4xl md:text-5xl animate-pulse">
+                      {isRTL ? <FaHandPointRight /> : <FaHandPointLeft />}
+                    </div>
+                  </div>
+                )}
+                {/* END OF FORM TEST BUTTON */}
 
                 {/* Active Tab Content */}
                 {activeTabData && (
@@ -625,25 +648,22 @@ const AnalysesDetails = ({
                           });
                         }
                       }}
-                      className={`flex flex-col items-center justify-center p-4 rounded-2xl border transition-all duration-300 gap-3 group ${
-                        activeTab === tab.id
+                      className={`flex flex-col items-center justify-center p-4 rounded-2xl border transition-all duration-300 gap-3 group ${activeTab === tab.id
                           ? "bg-primary border-primary shadow-lg shadow-primary/20"
                           : "bg-slate-50 border-slate-100 hover:bg-white hover:border-primary/30"
-                      }`}
+                        }`}
                     >
                       <div
-                        className={`text-xl transition-colors duration-300 ${
-                          activeTab === tab.id
+                        className={`text-xl transition-colors duration-300 ${activeTab === tab.id
                             ? "text-white"
                             : "text-primary group-hover:scale-110"
-                        }`}
+                          }`}
                       >
                         {tab.icon}
                       </div>
                       <span
-                        className={`text-[11px] font-black uppercase text-center leading-tight transition-colors duration-300 ${
-                          activeTab === tab.id ? "text-white" : "text-slate-500"
-                        }`}
+                        className={`text-[11px] font-black uppercase text-center leading-tight transition-colors duration-300 ${activeTab === tab.id ? "text-white" : "text-slate-500"
+                          }`}
                       >
                         {tab.label}
                       </span>
@@ -663,6 +683,13 @@ const AnalysesDetails = ({
         locale={locale}
         isRTL={isRTL}
       />
+
+      {/* FORM TEST BUTTTO*/}
+
+      {showFormTest && (
+        <FormTest onClose={() => setShowFormTest(false)} isRTL={isRTL} />
+      )}
+      {/* END OF FORM TEST BUTTON */}
     </div>
   );
 };
