@@ -2,7 +2,7 @@
 import React from "react";
 import { FaTimes } from "react-icons/fa";
 
-const FormTest = ({ onClose, isRTL }) => {
+const FormTest = ({ onClose, isRTL, formUrl = "/BUNYAN_Multiple_Relationships_Final_Interactive.html", formTitle = "بنيان | استبيان التأمل في دوافع تعدد العلاقات" }) => {
   return (
     <div className="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-sm flex items-center justify-center p-2 sm:p-6">
       <div 
@@ -13,7 +13,7 @@ const FormTest = ({ onClose, isRTL }) => {
         <div className="flex items-center justify-between p-4 sm:p-6 border-b border-white/10 bg-[#030810]">
           <h2 className="text-[#d8b56b] text-base sm:text-xl font-black tracking-widest flex items-center gap-3">
             <span className="text-xl">✦</span>
-            بنيان | استبيان التأمل في دوافع تعدد العلاقات
+            {formTitle}
           </h2>
           <button 
             onClick={onClose}
@@ -27,7 +27,7 @@ const FormTest = ({ onClose, isRTL }) => {
         {/* Iframe Container */}
         <div className="flex-1 w-full bg-[#06111e] relative">
           <iframe 
-            src="/BUNYAN_Multiple_Relationships_Final_Interactive.html" 
+            src={formUrl} 
             className="absolute inset-0 w-full h-full border-0"
             title="Bunyan Scale"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

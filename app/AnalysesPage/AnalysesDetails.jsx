@@ -237,6 +237,8 @@ const AnalysesDetails = ({
   const [imageBroken, setImageBroken] = React.useState(false);
   const [activeTab, setActiveTab] = React.useState(null);
   const [showFormTest, setShowFormTest] = React.useState(false);
+  const [formTestUrl, setFormTestUrl] = React.useState("");
+  const [formTestTitle, setFormTestTitle] = React.useState("");
   const containerRef = React.useRef(null);
 
   useEffect(() => {
@@ -451,24 +453,42 @@ const AnalysesDetails = ({
                 </h2>
                 {/* FORM TEST BUTTON */}
 
-                {content.title && content.title.includes("تعدد العلاقات") && (
-                  <div className="flex justify-start items-center gap-4">
-                    <button
-                      onClick={() => setShowFormTest(true)}
-                      className="group flex items-center gap-4 bg-gradient-to-r from-[#d8b56b] to-[#aa803a] text-[#071321] px-6 py-4 md:px-8 md:py-5 rounded-[1.5rem] font-black text-base md:text-xl shadow-[0_10px_30px_rgba(216,181,107,0.3)] hover:shadow-[0_15px_40px_rgba(216,181,107,0.4)] transition-all duration-300 hover:-translate-y-1 relative overflow-hidden"
-                    >
-                      <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out" />
-                      <HiOutlineClipboardCheck className="text-2xl md:text-3xl relative z-10" />
-                      <span className="relative z-10">
-                        {isRTL ? "ابدأ استبيان بنيان للتأمل" : "Start Bunyan Questionnaire"}
-                      </span>
-                    </button>
-                    
-                    <div className="text-[#d8b56b] text-4xl md:text-5xl animate-pulse">
-                      {isRTL ? <FaHandPointRight /> : <FaHandPointLeft />}
+                {(() => {
+                  const isMultipleRelationshipsArticle = content.title && content.title.includes("تعدد العلاقات");
+                  const isWomenSelfReflectionArticle = content.title && content.title.includes("حين تبحث المرأة عن نفسها في رجلٍ آخر");
+                  
+                  if (!isMultipleRelationshipsArticle && !isWomenSelfReflectionArticle) return null;
+
+                  const handleOpenForm = () => {
+                    if (isMultipleRelationshipsArticle) {
+                      setFormTestUrl("/BUNYAN_Multiple_Relationships_Final_Interactive.html");
+                      setFormTestTitle("بنيان | استبيان التأمل في دوافع تعدد العلاقات");
+                    } else if (isWomenSelfReflectionArticle) {
+                      setFormTestUrl("/BUNYAN_Women_Self_Reflection_AR_REVISED_DESIGNED.html");
+                      setFormTestTitle("بنيان | استبيان التأمل للمرأة");
+                    }
+                    setShowFormTest(true);
+                  };
+
+                  return (
+                    <div className="flex justify-start items-center gap-4">
+                      <button
+                        onClick={handleOpenForm}
+                        className="group flex items-center gap-4 bg-gradient-to-r from-[#d8b56b] to-[#aa803a] text-[#071321] px-6 py-4 md:px-8 md:py-5 rounded-[1.5rem] font-black text-base md:text-xl shadow-[0_10px_30px_rgba(216,181,107,0.3)] hover:shadow-[0_15px_40px_rgba(216,181,107,0.4)] transition-all duration-300 hover:-translate-y-1 relative overflow-hidden"
+                      >
+                        <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out" />
+                        <HiOutlineClipboardCheck className="text-2xl md:text-3xl relative z-10" />
+                        <span className="relative z-10">
+                          {isRTL ? "ابدأ استبيان بنيان للتأمل" : "Start Bunyan Questionnaire"}
+                        </span>
+                      </button>
+                      
+                      <div className="text-[#d8b56b] text-4xl md:text-5xl animate-pulse">
+                        {isRTL ? <FaHandPointRight /> : <FaHandPointLeft />}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  );
+                })()}
                 {/* END OF FORM TEST BUTTON */}
 
                 {/* Active Tab Content */}
@@ -687,7 +707,12 @@ const AnalysesDetails = ({
       {/* FORM TEST BUTTTO*/}
 
       {showFormTest && (
-        <FormTest onClose={() => setShowFormTest(false)} isRTL={isRTL} />
+        <FormTest 
+          onClose={() => setShowFormTest(false)} 
+          isRTL={isRTL} 
+          formUrl={formTestUrl} 
+          formTitle={formTestTitle} 
+        />
       )}
       {/* END OF FORM TEST BUTTON */}
     </div>
